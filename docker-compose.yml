@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  youtube_rss:
+    container_name: "youtube_rss"
+    image: "youtube_rss"
+    build:
+      context: .
+      # context: https://github.com/martokk/youtube_rss.git#main
+      target: production
+    restart: unless-stopped
+    # depends_on:
+    #   - duckdns
+    env_file:
+      # - /home/ubuntu/volumes/youtube_rss/.env
+      - ./youtube_rss/.env
+    volumes:
+      # - /home/ubuntu/volumes/youtube_rss/.env:/workspace/.env
+      # - /home/ubuntu/volumes/youtube_rss/media:/workspace/media
+      # - /home/ubuntu/volumes/youtube_rss/logs:/workspace/logs
+      # - /home/ubuntu/volumes/youtube_rss/db.sqlite3:/workspace/db.sqlite3
+      - ./youtube_rss:/workspace
+    ports:
+      - "8002:8002"
