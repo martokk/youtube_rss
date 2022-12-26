@@ -11,14 +11,11 @@ services:
     restart: unless-stopped
     # depends_on:
     #   - duckdns
-    env_file:
-      # - /home/ubuntu/volumes/youtube_rss/.env
-      - ./youtube_rss/.env
+    # env_file:
+    #   # - /home/ubuntu/volumes/youtube_rss/.env
+    #   - ./youtube_rss/.env
     volumes:
-      # - /home/ubuntu/volumes/youtube_rss/.env:/workspace/.env
-      # - /home/ubuntu/volumes/youtube_rss/media:/workspace/media
-      # - /home/ubuntu/volumes/youtube_rss/logs:/workspace/logs
-      # - /home/ubuntu/volumes/youtube_rss/db.sqlite3:/workspace/db.sqlite3
-      - ./youtube_rss:/workspace
+      # - /home/ubuntu/volumes/youtube_rss/data:/youtube_rss/data
+      - ./youtube_rss:/youtube_rss
     ports:
-      - "8002:8002"
+      - "5000:5000"

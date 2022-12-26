@@ -655,3 +655,13 @@ build_win/
 dist_linux/
 dist_win/
 notes/
+
+youtube_rss/data/cache/
+
+youtube_rss/data/crud_old/
+
+youtube_rss/data/feed/
+
+youtube_rss/data/.env
+
+*.sqlite3
