@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response, status
 from fastapi.responses import HTMLResponse
 
-from youtube_rss.services.feed import build_rss_file, get_rss_file
+from youtube_rss.services.feed import build_rss_file, delete_rss_file, get_rss_file
 
 router = APIRouter()
 
@@ -34,3 +34,11 @@ async def update(feed_id: str):
     # Serve RSS File as a Response
     content = rss_file.read_text()
     return Response(content)
+
+
+@router.delete("/{feed_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(feed_id: str):
+    """
+    Deletes the .rss file for a feed.
+    """
+    return delete_rss_file(feed_id=feed_id)

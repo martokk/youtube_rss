@@ -36,6 +36,11 @@ def get_rss_file(feed_id: str) -> Path:
     return rss_file
 
 
+def delete_rss_file(feed_id: str):
+    rss_file = get_rss_file_path(feed_id=feed_id)
+    rss_file.unlink()
+
+
 def build_rss_file(feed_id: str) -> Path:
     """
     Builds a .rss file for source_id, saves it to disk.
@@ -138,5 +143,5 @@ class YoutubeFeed:
         rss_file = get_rss_file_path(feed_id=self.feed_id)
         if not self.feed:
             self.generate()
-        self.feed.rss_file(rss_file)
+        self.feed.rss_file(rss_file, encoding="UTF-8", pretty=True)
         return rss_file
