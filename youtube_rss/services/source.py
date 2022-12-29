@@ -4,32 +4,12 @@ import pickle
 from pathlib import Path
 
 from loguru import logger
-from yt_dlp import YoutubeDL
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
 from youtube_rss.db.crud import source_crud
 from youtube_rss.models.source import Source
 from youtube_rss.paths import SOURCE_INFO_CACHE_PATH
-
-YDL_OPTS_SOURCE = {
-    "logger": logger,
-    "outtmpl": "%(title)s%(ext)s",
-    "format": "b",
-    "skip_download": True,
-    "playlistend": BUILD_FEED_RECENT_VIDEOS,
-    "playlistreverse": True,
-    "dateafter": BUILD_FEED_DATEAFTER,
-}
-
-YDL_OPTS_SOURCE_METADATA = {
-    "logger": logger,
-    "outtmpl": "%(title)s%(ext)s",
-    "format": "b",
-    "skip_download": True,
-    "playlistend": 0,
-    "extract_flat": True,
-    "playlistreverse": True,
-}
+from youtube_rss.services.ytdlp import get_info_dict
 
 
 def get_source(source_id: str) -> Source:
@@ -42,19 +22,19 @@ def get_source(source_id: str) -> Source:
     return source
 
 
-def get_info_dict(url: str, ydl_opts: dict[str, Any]) -> dict[str, Any]:
-    with YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(url, download=False)
-
-    if info_dict is None:
-        raise ValueError(
-            f"yt-dlp did not download a info_dict object. {info_dict=} {url=} {ydl_opts=}"
-        )
-    return info_dict
-
-
 def get_source_metadata(url: str) -> dict[str, str]:
-    return get_info_dict(url=url, ydl_opts=YDL_OPTS_SOURCE_METADATA)
+    return get_info_dict(
+        url=url,
+        ydl_opts={
+            "logger": logger,
+            "outtmpl": "%(title)s%(ext)s",
+            "format": "b",
+            "skip_download": True,
+            "playlistend": 0,
+            "extract_flat": True,
+            "playlistreverse": True,
+        },
+    )
 
 
 def get_source_info_dict(
@@ -74,7 +54,18 @@ def get_source_info_dict(
             pass
 
     try:
-        info_dict = get_info_dict(url=url, ydl_opts=YDL_OPTS_SOURCE)
+        info_dict = get_info_dict(
+            url=url,
+            ydl_opts={
+                "logger": logger,
+                "outtmpl": "%(title)s%(ext)s",
+                "format": "b",
+                "skip_download": True,
+                "playlistend": BUILD_FEED_RECENT_VIDEOS,
+                "playlistreverse": True,
+                "dateafter": BUILD_FEED_DATEAFTER,
+            },
+        )
     except ValueError as exc:
         raise ValueError(
             f"Youtube-DL did not download 'source_info' for feed ({source_id=})."

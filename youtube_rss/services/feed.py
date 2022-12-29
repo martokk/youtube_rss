@@ -107,12 +107,14 @@ class YoutubeFeed:
         """
         Generates rss post for a FeedGenerator feed.
         """
+        enclosure_url = f"{BASE_DOMAIN}/mp4/{video['extractor_key']}/{video['id']}"
+
         post = feed.add_entry()
         post.author({"name": video.get("uploader")})
         post.id(video["original_url"])
         post.title(video["title"])
         post.description(video["description"])
-        post.enclosure(url=video["url"], length=str(video["filesize_approx"]), type="video/mp4")
+        post.enclosure(url=enclosure_url, length=str(video["filesize_approx"]), type="video/mp4")
         post.published(
             datetime.datetime.strptime(video["upload_date"], "%Y%m%d").replace(
                 tzinfo=datetime.timezone.utc
