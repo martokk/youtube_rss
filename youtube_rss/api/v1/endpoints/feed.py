@@ -27,7 +27,7 @@ async def update(feed_id: str):
     Builds a new rss file for feed_id and returns it as a Response.
     """
     try:
-        rss_file = build_rss_file(feed_id=feed_id)
+        rss_file = build_rss_file(feed_id=feed_id, use_cache=False)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.args) from exc
 
