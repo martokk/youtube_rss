@@ -64,8 +64,12 @@ class YoutubeFeed:
         Generate a RSS Feed from Youtube Link
         """
         self.feed_id = feed_id
-        self.feed: FeedGenerator = FeedGenerator()
-        self.feed.load_extension("podcast")
+        self.feed: FeedGenerator = self.init_feed()
+
+    def init_feed(self) -> FeedGenerator:
+        feed: FeedGenerator = FeedGenerator()
+        feed.load_extension("podcast")
+        return feed
 
     def generate_rss_header(
         self, feed: FeedGenerator, source: Source, source_info_dict: dict[str, Any]

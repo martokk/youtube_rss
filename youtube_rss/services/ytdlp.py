@@ -3,19 +3,22 @@ from typing import Any
 from fastapi.responses import StreamingResponse
 from loguru import logger
 from yt_dlp import YoutubeDL
-from yt_dlp.extractor.youtube import YoutubeIE
 
 from youtube_rss.core.proxy import reverse_proxy
 
-YDL_OPTS_DIRECT_DOWNLOAD_URL = {
+YDL_OPTS_BASE = {
     "logger": logger,
     "outtmpl": "%(title)s%(ext)s",
     "format": "b",
     "skip_download": True,
+    "simulate": True,
 }
 
 
 def get_info_dict(url: str, ydl_opts: dict[str, Any], ie_key=None) -> dict[str, Any]:
+    """
+    Used yt-dlp to get info_dict for object.
+    """
     with YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=False, ie_key=ie_key)
 
@@ -30,20 +33,10 @@ def get_direct_download_url(url: str) -> str:
     """
     Gets the direct download url from a video_id
     """
-    # print(video_id)
-    # url = "http://www.example.com"
-    # return url
-
     info_dict = get_info_dict(
         url=url,
-        ydl_opts={
-            "logger": logger,
-            "outtmpl": "%(title)s%(ext)s",
-            "format": "b",
-            "skip_download": True,
-        },
+        ydl_opts=YDL_OPTS_BASE,
     )
-
     return info_dict["url"]
 
 
@@ -54,15 +47,8 @@ def get_direct_download_url_from_extractor_video_id(extractor: str, video_id: st
     info_dict = get_info_dict(
         url=video_id,
         ie_key=extractor,
-        ydl_opts={
-            "logger": logger,
-            "outtmpl": "%(title)s%(ext)s",
-            "format": "b",
-            "skip_download": True,
-            "simulate": True,
-        },
+        ydl_opts=YDL_OPTS_BASE,
     )
-
     return info_dict["url"]
 
 
