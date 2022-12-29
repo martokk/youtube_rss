@@ -1,5 +1,6 @@
 from typing import Any
 
+from fastapi.requests import Request
 from fastapi.responses import StreamingResponse
 from loguru import logger
 from yt_dlp import YoutubeDL
@@ -52,7 +53,7 @@ def get_direct_download_url_from_extractor_video_id(extractor: str, video_id: st
     return info_dict["url"]
 
 
-async def ytdlp_reverse_proxy(extractor: str, video_id: str) -> StreamingResponse:
+async def ytdlp_reverse_proxy(extractor: str, video_id: str, request: Request) -> StreamingResponse:
     """
     Streams the video_id's direct download url via a reverse proxy.
     """
@@ -60,4 +61,4 @@ async def ytdlp_reverse_proxy(extractor: str, video_id: str) -> StreamingRespons
         extractor=extractor, video_id=video_id
     )
 
-    return await reverse_proxy(url=direct_download_url)
+    return await reverse_proxy(url=direct_download_url, request=request)
