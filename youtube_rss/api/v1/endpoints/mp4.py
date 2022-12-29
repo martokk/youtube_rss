@@ -11,5 +11,4 @@ async def reverse_proxy_video_id(extractor: str, video_id: str) -> StreamingResp
     """
     Streams the response of yt-dlp
     """
-    url = f"https://www.youtube.com/watch?v={video_id}"
     return await ytdlp_reverse_proxy(extractor=extractor, video_id=video_id)
