@@ -3,7 +3,7 @@ from typing import Any, Optional
 from pydantic import root_validator
 from sqlmodel import Field, SQLModel
 
-from youtube_rss.constants import BASE_URL
+from youtube_rss.config import BASE_URL
 
 
 class SourceBase(SQLModel):

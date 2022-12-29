@@ -7,8 +7,7 @@ from dateutil import tz
 from feedgen.feed import FeedGenerator
 from loguru import logger
 
-from youtube_rss.config import USE_CACHE
-from youtube_rss.constants import BASE_URL
+from youtube_rss.config import BASE_URL, USE_CACHE
 from youtube_rss.db.crud import source_crud
 from youtube_rss.models.source import Source
 from youtube_rss.paths import FEEDS_PATH
