@@ -8,7 +8,7 @@ from feedgen.feed import FeedGenerator
 from loguru import logger
 
 from youtube_rss.config import USE_CACHE
-from youtube_rss.constants import BASE_DOMAIN
+from youtube_rss.constants import BASE_URL
 from youtube_rss.db.crud import source_crud
 from youtube_rss.models.source import Source
 from youtube_rss.paths import FEEDS_PATH
@@ -79,7 +79,7 @@ class YoutubeFeed:
         Generates header for a FeedGenerator feed.
         """
         feed.title(source.name)
-        feed.link(href=f"{BASE_DOMAIN}/feed/{source.source_id}", rel="self")
+        feed.link(href=f"{BASE_URL}/feed/{source.source_id}", rel="self")
         feed.id(source_info_dict["uploader_id"])
         feed.author({"name": source_info_dict["uploader"]})
         feed.link(href=source_info_dict["uploader_url"], rel="alternate")
@@ -115,7 +115,7 @@ class YoutubeFeed:
         """
         Generates rss post for a FeedGenerator feed.
         """
-        enclosure_url = f"{BASE_DOMAIN}/mp4/{video['extractor_key']}/{video['id']}"
+        enclosure_url = f"{BASE_URL}/mp4/{video['extractor_key']}/{video['id']}"
 
         post = feed.add_entry()
         post.author({"name": video.get("uploader")})

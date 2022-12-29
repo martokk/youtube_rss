@@ -3,7 +3,7 @@ from typing import Any, Optional
 from pydantic import root_validator
 from sqlmodel import Field, SQLModel
 
-from youtube_rss.constants import BASE_DOMAIN
+from youtube_rss.constants import BASE_URL
 
 
 class SourceBase(SQLModel):
@@ -20,7 +20,7 @@ class Source(SourceBase, table=True):
         cls, values: dict[str, Any]
     ) -> dict[str, Any]:
         source_id = values.get("source_id")
-        values["feed_url"] = f"{BASE_DOMAIN}/feed/{source_id}"
+        values["feed_url"] = f"{BASE_URL}/feed/{source_id}"
         return values
 
 
