@@ -15,9 +15,7 @@ SERVER_PORT = int(os.environ.get("SERVER_PORT", 5000))
 
 # Database
 DATABASE_ECHO = os.environ.get("DATABASE_ECHO", "True") == "True"
-print(os.environ)
-print(ENV_FILE)
-print(DATABASE_ECHO)
+
 # Cache
 USE_CACHE = bool(os.environ.get("USE_CACHE", True))
 BUILD_FEED_CACHE_INTERVAL_MINUTES = int(os.environ.get("BUILD_FEED_CACHE_INTERVAL_MINUTES", 10))
