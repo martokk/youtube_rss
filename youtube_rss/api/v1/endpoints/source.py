@@ -22,6 +22,7 @@ async def create(source_base: SourceBase) -> Source:
         "source_id": source_metadata["uploader_id"],
         "name": source_metadata["uploader"],
         "url": source_base.url,
+        "feed_url": "",
     }
     source = Source(**source_dict)
     return source_crud.create(source)

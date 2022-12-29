@@ -665,3 +665,5 @@ youtube_rss/data/feed/
 youtube_rss/data/.env
 
 *.sqlite3
+
+*.old
