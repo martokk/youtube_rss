@@ -42,12 +42,12 @@ def delete_rss_file(feed_id: str):
     rss_file.unlink()
 
 
-def build_rss_file(feed_id: str) -> Path:
+def build_rss_file(feed_id: str, use_cache=USE_CACHE) -> Path:
     """
     Builds a .rss file for source_id, saves it to disk.
     """
     feed = YoutubeFeed(feed_id=feed_id)
-    feed.generate()
+    feed.generate(use_cache=use_cache)
     return feed.save()
 
 
@@ -56,7 +56,7 @@ def build_all_rss_files() -> None:
     Build .rss files for all sources, save to disk."""
     sources = source_crud.get_all()
     for source in sources:
-        build_rss_file(feed_id=source.source_id)
+        build_rss_file(feed_id=source.source_id, use_cache=False)
 
 
 class YoutubeFeed:
@@ -135,7 +135,7 @@ class YoutubeFeed:
 
         return feed
 
-    def generate(self) -> None:
+    def generate(self, use_cache: bool) -> None:
         """
         Generate a FeedGenerator Feed
         """
@@ -143,7 +143,7 @@ class YoutubeFeed:
         source_info_dict = get_source_info_dict(
             source_id=source.source_id,
             url=source.url,
-            use_cache=USE_CACHE,
+            use_cache=use_cache,
         )  # TODO: Currently ALWAYS using cache. Decide how to properly handle this
 
         self.feed = self.generate_rss_header(
