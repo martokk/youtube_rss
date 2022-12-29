@@ -14,7 +14,7 @@ async def get_all() -> List[Video]:
     """
     Get all items.
     """
-    return video_crud.get_all()
+    return crud.get_all()
 
 
 @router.post("/", response_model=Video, status_code=status.HTTP_201_CREATED)
@@ -22,7 +22,7 @@ async def create(video: Video) -> Video:
     """
     Create new item.
     """
-    return video_crud.create(video)
+    return crud.create(video)
 
 
 @router.get("/{video_id}", response_model=Video)
@@ -30,7 +30,7 @@ async def get(video_id: str) -> Video:
     """
     Get item by ID.
     """
-    db_video = video_crud.get(video_id=video_id)
+    db_video = crud.get(video_id=video_id)
     if db_video is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found")
     return db_video
@@ -41,14 +41,14 @@ async def update(video_id: str, video: Video) -> Video:
     """
     Update an item.
     """
-    db_video = video_crud.get(video_id=video_id)
+    db_video = crud.get(video_id=video_id)
     if db_video is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found")
     update_data = video.dict()
     for field in video.dict():
         if field in update_data:
             setattr(db_video, field, update_data[field])
-    video_crud.update(db_video)
+    crud.update(db_video)
     return video
 
 
