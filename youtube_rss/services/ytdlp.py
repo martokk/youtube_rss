@@ -15,7 +15,7 @@ YDL_OPTS_DIRECT_DOWNLOAD_URL = {
 }
 
 
-def get_info_dict(url: str, ydl_opts: dict[str, Any], ie_key=str) -> dict[str, Any]:
+def get_info_dict(url: str, ydl_opts: dict[str, Any], ie_key=None) -> dict[str, Any]:
     with YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=False, ie_key=ie_key)
 
