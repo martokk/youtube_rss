@@ -12,7 +12,7 @@ from youtube_rss.paths import SOURCE_INFO_CACHE_PATH
 from youtube_rss.services.ytdlp import get_info_dict
 
 
-def get_source(source_id: str) -> Source:
+async def get_source(source_id: str) -> Source:
     """
     Get Source obj from source_id
     """
@@ -22,8 +22,8 @@ def get_source(source_id: str) -> Source:
     return source
 
 
-def get_source_metadata(url: str) -> dict[str, str]:
-    return get_info_dict(
+async def get_source_metadata(url: str) -> dict[str, str]:
+    return await get_info_dict(
         url=url,
         ydl_opts={
             "logger": logger,
@@ -37,7 +37,7 @@ def get_source_metadata(url: str) -> dict[str, str]:
     )
 
 
-def get_source_info_dict(
+async def get_source_info_dict(
     source_id: str,
     url: str,
     use_cache=False,
@@ -54,7 +54,7 @@ def get_source_info_dict(
             pass
 
     try:
-        info_dict = get_info_dict(
+        info_dict = await get_info_dict(
             url=url,
             ydl_opts={
                 "logger": logger,

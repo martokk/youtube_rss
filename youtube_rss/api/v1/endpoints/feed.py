@@ -12,7 +12,7 @@ async def get(feed_id: str):
     Gets a rss file for feed_id and returns it as a Response
     """
     try:
-        rss_file = get_rss_file(feed_id=feed_id)
+        rss_file = await get_rss_file(feed_id=feed_id)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.args) from exc
 
@@ -27,7 +27,7 @@ async def update(feed_id: str):
     Builds a new rss file for feed_id and returns it as a Response.
     """
     try:
-        rss_file = build_rss_file(feed_id=feed_id, use_cache=False)
+        rss_file = await build_rss_file(feed_id=feed_id, use_cache=False)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.args) from exc
 
@@ -41,4 +41,4 @@ async def delete(feed_id: str):
     """
     Deletes the .rss file for a feed.
     """
-    return delete_rss_file(feed_id=feed_id)
+    return await delete_rss_file(feed_id=feed_id)

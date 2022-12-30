@@ -18,7 +18,7 @@ app.mount("/feed", StaticFiles(directory=FEEDS_PATH), name="feed")
 @app.on_event("startup")  # type: ignore
 async def on_startup() -> None:
     """
-    On Statup:
+    On Startup:
         - create database and tables.
     """
     return await create_db_and_tables()
@@ -32,7 +32,7 @@ async def repeating_build_cache_for_all_feeds() -> None:
         - Build .rss file cache for all feeds/sources.
     """
     logger.info("Building (.rss) cache for all feeds.")
-    build_all_rss_files()
+    await build_all_rss_files()
     logger.success("Completed building (.rss) cache for all feeds.")
 
 

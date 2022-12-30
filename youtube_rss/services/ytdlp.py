@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from fastapi.requests import Request
 from fastapi.responses import StreamingResponse
@@ -16,7 +16,9 @@ YDL_OPTS_BASE = {
 }
 
 
-def get_info_dict(url: str, ydl_opts: dict[str, Any], ie_key=None) -> dict[str, Any]:
+async def get_info_dict(
+    url: str, ydl_opts: dict[str, Any], ie_key: Optional[str] = None
+) -> dict[str, Any]:
     """
     Used yt-dlp to get info_dict for object.
     """
@@ -30,22 +32,22 @@ def get_info_dict(url: str, ydl_opts: dict[str, Any], ie_key=None) -> dict[str, 
     return info_dict
 
 
-def get_direct_download_url(url: str) -> str:
+async def get_direct_download_url(url: str) -> str:
     """
     Gets the direct download url from a video_id
     """
-    info_dict = get_info_dict(
+    info_dict = await get_info_dict(
         url=url,
         ydl_opts=YDL_OPTS_BASE,
     )
     return info_dict["url"]
 
 
-def get_direct_download_url_from_extractor_video_id(extractor: str, video_id: str) -> str:
+async def get_direct_download_url_from_extractor_video_id(extractor: str, video_id: str) -> str:
     """
     Gets the direct download url from a extractor and video_id
     """
-    info_dict = get_info_dict(
+    info_dict = await get_info_dict(
         url=video_id,
         ie_key=extractor,
         ydl_opts=YDL_OPTS_BASE,
@@ -57,7 +59,7 @@ async def ytdlp_reverse_proxy(extractor: str, video_id: str, request: Request) -
     """
     Streams the video_id's direct download url via a reverse proxy.
     """
-    direct_download_url = get_direct_download_url_from_extractor_video_id(
+    direct_download_url = await get_direct_download_url_from_extractor_video_id(
         extractor=extractor, video_id=video_id
     )
 

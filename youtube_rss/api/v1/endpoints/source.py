@@ -16,7 +16,7 @@ async def get_all() -> List[Source]:
 
 @router.post("/", response_model=Source, status_code=status.HTTP_201_CREATED)
 async def create(source_base: SourceBase) -> Source:
-    source_metadata = get_source_metadata(url=source_base.url)
+    source_metadata = await get_source_metadata(url=source_base.url)
 
     source_dict = {
         "source_id": source_metadata["uploader_id"],
