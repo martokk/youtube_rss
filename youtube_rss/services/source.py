@@ -57,13 +57,11 @@ async def get_source_info_dict(
         info_dict = await get_info_dict(
             url=url,
             ydl_opts={
-                "logger": logger,
-                "outtmpl": "%(title)s%(ext)s",
-                "format": "b",
                 "skip_download": True,
                 "playlistend": BUILD_FEED_RECENT_VIDEOS,
                 "playlistreverse": True,
                 "dateafter": BUILD_FEED_DATEAFTER,
+                # "extract_flat": True,
             },
         )
     except ValueError as exc:
