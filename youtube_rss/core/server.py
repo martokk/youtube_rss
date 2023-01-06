@@ -1,10 +1,16 @@
 import uvicorn
 from loguru import logger
+from rich.logging import RichHandler
 
 from youtube_rss.config import SERVER_IP, SERVER_PORT
 
+handler = RichHandler(level="DEBUG")
+logger.add(handler)
+logger.bind()
+
 
 def start_server() -> None:
+    logger.info("Starting uvicorn server.")
     uvicorn.run(
         "youtube_rss.core.app:app",
         host=SERVER_IP,
@@ -13,4 +19,3 @@ def start_server() -> None:
         reload=True,
         app_dir="",
     )
-    logger.success("Uvicorn Server started")

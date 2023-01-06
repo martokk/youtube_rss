@@ -15,6 +15,7 @@ CACHE_PATH = DATA_PATH / "cache"
 
 # Cache Folders
 SOURCE_INFO_CACHE_PATH = CACHE_PATH / "source_info"
+VIDEO_INFO_CACHE_PATH = CACHE_PATH / "video_info"
 
 # Files
 ENV_FILE = DATA_PATH / ".env"

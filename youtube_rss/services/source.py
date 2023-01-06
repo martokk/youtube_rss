@@ -1,73 +1,120 @@
 from typing import Any
 
 import pickle
+from datetime import datetime
 from pathlib import Path
 
-from loguru import logger
-
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
-from youtube_rss.db.crud import source_crud
-from youtube_rss.models.source import Source
+from youtube_rss.core.debug_helpers import log_function_enter_exit
+from youtube_rss.models.source import Source, SourceOrderBy, generate_source_id_from_url
+from youtube_rss.models.video import Video
 from youtube_rss.paths import SOURCE_INFO_CACHE_PATH
-from youtube_rss.services.ytdlp import get_info_dict
+from youtube_rss.services.ytdlp import YDL_OPTS_BASE, get_info_dict
 
 
-async def get_source(source_id: str) -> Source:
+async def get_source_ydl_opts(extract_flat: bool) -> dict[str, Any]:
     """
-    Get Source obj from source_id
+    Get the yt-dlp options for a source.
+
+    Parameters:
+        extract_flat (bool): Whether to extract a flat list of videos in the playlist.
+
+    Returns:
+        dict: The yt-dlp options for the source.
     """
-    source = source_crud.get(source_id=source_id)
-    if source is None:
-        raise FileNotFoundError(f"Source ({source_id=}) was not found.")
-    return source
+    return {
+        **YDL_OPTS_BASE,
+        "playlistreverse": True,
+        "extract_flat": extract_flat,
+        "playlistend": BUILD_FEED_RECENT_VIDEOS,
+        "dateafter": BUILD_FEED_DATEAFTER,
+    }
 
 
-async def get_source_metadata(url: str) -> dict[str, str]:
-    return await get_info_dict(
-        url=url,
-        ydl_opts={
-            "logger": logger,
-            "outtmpl": "%(title)s%(ext)s",
-            "format": "b",
-            "skip_download": True,
-            "playlistend": 0,
-            "extract_flat": True,
-            "playlistreverse": True,
-        },
-    )
-
-
+@log_function_enter_exit()
 async def get_source_info_dict(
-    source_id: str,
+    source_id: str | None,
     url: str,
+    extract_flat: bool,
     use_cache=False,
 ) -> dict[str, Any]:
     """
-    Uses yt-dlp to get the info_dict from youtube url.
+    Retrieve the info_dict from yt-dlp for a Source
+
+    Parameters:
+        source_id (Union[str, None]): An optional ID for the source. If not provided,
+            a unique ID will be generated from the URL.
+        url (str): The URL of the Source
+        extract_flat (bool): Whether to extract a flat list of videos in the playlist.
+        use_cache (bool, optional): Whether to use a cached version of the info dictionary
+            if it is available. Defaults to False.
+
+    Returns:
+        dict: The info dictionary for the Source
+
     """
+    source_id = await generate_source_id_from_url(url=url)
     cache_file = Path(SOURCE_INFO_CACHE_PATH / source_id)
 
-    if use_cache:
-        try:
-            return pickle.load(cache_file.open("rb"))
-        except FileNotFoundError:
-            pass
+    # Load Cache
+    if use_cache and cache_file.exists():
+        return pickle.loads(cache_file.read_bytes())
 
-    try:
-        info_dict = await get_info_dict(
-            url=url,
-            ydl_opts={
-                "skip_download": True,
-                "playlistend": BUILD_FEED_RECENT_VIDEOS,
-                "playlistreverse": True,
-                "dateafter": BUILD_FEED_DATEAFTER,
-                # "extract_flat": True,
-            },
-        )
-    except ValueError as exc:
-        raise ValueError(
-            f"Youtube-DL did not download 'source_info' for feed ({source_id=})."
-        ) from exc
+    # Get info_dict from yt-dlp
+    ydl_opts = await get_source_ydl_opts(extract_flat=extract_flat)
+    info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts)
 
-    pickle.dump(info_dict, cache_file.open("wb"))
+    # Save Pickle
+    cache_file.write_bytes(pickle.dumps(info_dict))
     return info_dict
+
+
+async def get_source_from_source_info_dict(source_info_dict: dict[str, Any]) -> Source:
+    """
+    Get a `Source` object from a source_info_dict.
+
+    Parameters:
+        source_info_dict (dict): The source_info_dict.
+
+    Returns:
+        Source: The `Source` object.
+    """
+    source_videos = await get_source_videos_from_source_info_dict(source_info_dict=source_info_dict)
+    return Source(
+        url=source_info_dict["url"],
+        name=source_info_dict["title"],
+        author=source_info_dict["uploader"],
+        logo=source_info_dict["thumbnails"][2]["url"],
+        ordered_by=SourceOrderBy.RELEASE.value,
+        description=source_info_dict["description"],
+        videos=source_videos,
+        extractor=source_info_dict["extractor_key"],
+    )
+
+
+async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, Any]) -> list[Video]:
+    """
+    Get a list of `Video` objects from a source_info_dict.
+
+    Parameters:
+        source_info_dict (dict): The source_info_dict.
+
+    Returns:
+        list: The list of `Video` objects.
+    """
+    entries = source_info_dict["entries"]
+    playlists = entries if entries[0].get("entries") else [entries]
+    return [
+        Video(
+            title=video["title"],
+            description=video["description"],
+            url=video.get("webpage_url", video["url"]),
+            released_at=datetime.strptime(video.get("upload_date"), "%Y%m%d")
+            if video.get("upload_date")
+            else None,
+            media_url=None,
+            media_filesize=None,
+        )
+        for playlist in playlists
+        for video in playlist.get("entries", [])
+    ]

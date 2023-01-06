@@ -1,58 +1,74 @@
-from typing import List
-
 from fastapi import APIRouter, HTTPException, status
 
-from youtube_rss.db.crud import source_crud
-from youtube_rss.models.source import Source, SourceBase
-from youtube_rss.services.source import get_source_metadata
+from youtube_rss.core.debug_helpers import log_function_enter_exit
+from youtube_rss.crud.exceptions import RecordAlreadyExistsError, RecordNotFoundError
+from youtube_rss.crud.source import source_crud
+from youtube_rss.models.source import Source, SourceCreate, SourceRead
 
 router = APIRouter()
+crud = source_crud
 
 
-@router.get("/", response_model=List[Source], status_code=status.HTTP_200_OK)
-async def get_all() -> List[Source]:
-    return source_crud.get_all()
+router = APIRouter()
+crud = source_crud
+ModelClass = Source
+ModelReadClass = SourceRead
+ModelCreateClass = SourceCreate
 
 
-@router.post("/", response_model=Source, status_code=status.HTTP_201_CREATED)
-async def create(source_base: SourceBase) -> Source:
-    source_metadata = await get_source_metadata(url=source_base.url)
-
-    source_dict = {
-        "source_id": source_metadata["uploader_id"],
-        "name": source_metadata["uploader"],
-        "url": source_base.url,
-        "feed_url": "",
-    }
-    source = Source(**source_dict)
-    return source_crud.create(source)
+@router.post("/", response_model=ModelReadClass, status_code=status.HTTP_201_CREATED)
+async def create(in_obj: ModelCreateClass) -> ModelClass:
+    """
+    Create a new item.
+    """
+    try:
+        return await crud.create_source_from_url(url=in_obj.url)
+    except RecordAlreadyExistsError as exc:
+        raise HTTPException(status_code=status.HTTP_200_OK, detail="Source already exists") from exc
 
 
-@router.get("/{source_id}", response_model=Source)
-async def get(source_id: str) -> Source:
-    db_source = source_crud.get(source_id=source_id)
-    if db_source is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found")
-    return db_source
+@router.get("/{id}", response_model=ModelReadClass)
+async def get(id: str) -> ModelClass | None:
+    """
+    Get an item.
+    """
+    try:
+        return await crud.get(id=id)
+    except RecordNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"
+        ) from exc
 
 
-@router.patch("/{source_id}", response_model=Source)
-async def update(source_id: str, source: Source) -> Source:
-    db_source = source_crud.get(source_id=source_id)
-    if db_source is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found")
-
-    update_data = source.dict()
-    for field in source.dict():
-        if field in update_data:
-            setattr(db_source, field, update_data[field])
-    source_crud.update(db_source)
-    return source
+@router.get("/", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
+async def get_all() -> list[ModelClass] | None:
+    """
+    Get all items.
+    """
+    return await crud.get_all()
 
 
-@router.delete("/{source_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete(source_id: str) -> bool:
-    db_source = source_crud.get(source_id=source_id)
-    if db_source is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found")
-    return source_crud.delete(db_source)
+@router.patch("/{id}", response_model=ModelReadClass)
+async def update(id: str, in_obj: ModelCreateClass) -> ModelClass:
+    """
+    Update an item.
+    """
+    try:
+        return await crud.update(in_obj, id=id)
+    except RecordNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"
+        ) from exc
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(id: str) -> None:
+    """
+    Delete an item.
+    """
+    try:
+        return await crud.delete(id=id)
+    except RecordNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"
+        ) from exc
