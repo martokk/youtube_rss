@@ -142,3 +142,24 @@ async def sort_videos_by_updated_at(videos: list[Video]) -> list[Video]:
         The sorted list of videos.
     """
     return sorted(videos, key=lambda video: video.updated_at, reverse=False)
+
+
+async def get_media_url_from_video_id(video_id: str) -> str:
+    """
+    Get the media URL for a video.
+
+    Args:
+        video_id: The id of the video to get the media URL for.
+
+    Returns:
+        The media URL for the video.
+
+    Raises:
+        ValueError: If the media URL for the video cannot be fetched.
+    """
+    video = await video_crud.get(id=video_id)
+    if not video.media_url:
+        video = await video_crud.fetch_video(video_id=video_id)
+        if not video.media_url:
+            raise ValueError("Unable to fetch media_url")
+    return video.media_url
