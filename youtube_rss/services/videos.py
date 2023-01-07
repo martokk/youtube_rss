@@ -1,11 +1,8 @@
 from typing import Any
 
-import pickle
 from datetime import datetime, timezone
-from pathlib import Path
 
-from youtube_rss.models.video import Video, generate_video_id_from_url
-from youtube_rss.paths import VIDEO_INFO_CACHE_PATH
+from youtube_rss.models.video import Video
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE, get_info_dict
 
 
@@ -20,9 +17,7 @@ async def get_video_ydl_opts() -> dict[str, Any]:
 
 
 async def get_video_info_dict(
-    video_id: str | None,
     url: str,
-    use_cache=False,
 ) -> dict[str, Any]:
     """
     Retrieve the info_dict for a Video.
@@ -32,29 +27,26 @@ async def get_video_info_dict(
     info dictionary and then stores it in the cache for future use.
 
     Parameters:
-        video_id (Optional[str]): An optional ID for the video. If not provided,
-            a unique ID will be generated from the URL.
         url (str): The URL of the video.
-        use_cache (bool, optional): Whether to use a cached version of the info dictionary
-            if it is available. Defaults to False.
+
 
     Returns:
         dict: The info dictionary for the video.
     """
-    video_id = generate_video_id_from_url(url=url)
-    cache_file = Path(VIDEO_INFO_CACHE_PATH / video_id)
+    # video_id = generate_video_id_from_url(url=url)
+    # cache_file = Path(VIDEO_INFO_CACHE_PATH / f"{video_id}.pickle")
 
     # Load Cache
-    if use_cache and cache_file.exists():
-        return pickle.loads(cache_file.read_bytes())
+    # if use_cache and cache_file.exists():
+    #     return pickle.loads(cache_file.read_bytes())
 
     # Get info_dict from yt-dlp
     ydl_opts = await get_video_ydl_opts()
     info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts)
 
     # Save Pickle
-    cache_file.parent.mkdir(exist_ok=True, parents=True)
-    cache_file.write_bytes(pickle.dumps(info_dict))
+    # cache_file.parent.mkdir(exist_ok=True, parents=True)
+    # cache_file.write_bytes(pickle.dumps(info_dict))
     return info_dict
 
 

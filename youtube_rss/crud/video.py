@@ -6,12 +6,8 @@ from youtube_rss.config import MAX_VIDEO_AGE_HOURS
 from youtube_rss.core.debug_helpers import timeit
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError
 from youtube_rss.db.database import engine
-from youtube_rss.models.video import Video, VideoCreate, VideoRead
-from youtube_rss.services.videos import (
-    generate_video_id_from_url,
-    get_video_from_video_info_dict,
-    get_video_info_dict,
-)
+from youtube_rss.models.video import Video, VideoCreate, VideoRead, generate_video_id_from_url
+from youtube_rss.services.videos import get_video_from_video_info_dict, get_video_info_dict
 
 from .base import BaseCRUD
 
@@ -40,11 +36,7 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
             raise RecordAlreadyExistsError("Record already exists for url.")
 
         # Fetch video information from yt-dlp and create the video object
-        video_info_dict = await get_video_info_dict(
-            video_id=video_id,
-            url=url,
-            use_cache=False,
-        )
+        video_info_dict = await get_video_info_dict(url=url)
         video = await get_video_from_video_info_dict(video_info_dict=video_info_dict)
 
         # Save the video to the database
@@ -63,11 +55,7 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
         db_video = await self.get(id=video_id)
 
         # Fetch video information from yt-dlp and create the video object
-        video_info_dict = await get_video_info_dict(
-            video_id=video_id,
-            url=db_video.url,
-            use_cache=False,
-        )
+        video_info_dict = await get_video_info_dict(url=db_video.url)
         video = await get_video_from_video_info_dict(video_info_dict=video_info_dict)
 
         # Update the video in the database and return it
