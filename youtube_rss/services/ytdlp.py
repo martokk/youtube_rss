@@ -1,12 +1,7 @@
 from typing import Any
 
-from fastapi.requests import Request
-from fastapi.responses import StreamingResponse
 from loguru import logger
 from yt_dlp import YoutubeDL
-
-from youtube_rss.core.proxy import reverse_proxy
-from youtube_rss.crud.video import get_media_url_from_video_id
 
 YDL_OPTS_BASE: dict[str, Any] = {
     "logger": logger,
