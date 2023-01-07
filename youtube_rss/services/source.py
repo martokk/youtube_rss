@@ -1,16 +1,13 @@
 from typing import Any
 
-import pickle
 from datetime import datetime
-from pathlib import Path
 
 from dateutil import tz
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
 from youtube_rss.core.debug_helpers import log_function_enter_exit
-from youtube_rss.models.source import Source, SourceOrderBy, generate_source_id_from_url
+from youtube_rss.models.source import Source, SourceOrderBy
 from youtube_rss.models.video import Video
-from youtube_rss.paths import SOURCE_INFO_CACHE_PATH
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE, get_info_dict
 
 
@@ -38,7 +35,6 @@ async def get_source_info_dict(
     source_id: str | None,
     url: str,
     extract_flat: bool,
-    use_cache=False,
 ) -> dict[str, Any]:
     """
     Retrieve the info_dict from yt-dlp for a Source
@@ -48,19 +44,18 @@ async def get_source_info_dict(
             a unique ID will be generated from the URL.
         url (str): The URL of the Source
         extract_flat (bool): Whether to extract a flat list of videos in the playlist.
-        use_cache (bool, optional): Whether to use a cached version of the info dictionary
-            if it is available. Defaults to False.
+
 
     Returns:
         dict: The info dictionary for the Source
 
     """
-    source_id = source_id or await generate_source_id_from_url(url=url)
-    cache_file = Path(SOURCE_INFO_CACHE_PATH / source_id)
+    # source_id = source_id or await generate_source_id_from_url(url=url)
+    # cache_file = Path(SOURCE_INFO_CACHE_PATH / source_id)
 
-    # Load Cache
-    if use_cache and cache_file.exists():
-        return pickle.loads(cache_file.read_bytes())
+    # # Load Cache
+    # if use_cache and cache_file.exists():
+    #     return pickle.loads(cache_file.read_bytes())
 
     # Get info_dict from yt-dlp
     ydl_opts = await get_source_ydl_opts(extract_flat=extract_flat)
@@ -68,7 +63,7 @@ async def get_source_info_dict(
     _source_info_dict["source_id"] = source_id
 
     # Save Pickle
-    cache_file.write_bytes(pickle.dumps(_source_info_dict))
+    # cache_file.write_bytes(pickle.dumps(_source_info_dict))
     return _source_info_dict
 
 

@@ -5,11 +5,10 @@ from youtube_rss.core.debug_helpers import timeit
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError
 from youtube_rss.crud.video import VideoCRUD, refresh_videos
 from youtube_rss.db.database import engine
-from youtube_rss.models.source import Source, SourceCreate, SourceRead
+from youtube_rss.models.source import Source, SourceCreate, SourceRead, generate_source_id_from_url
 from youtube_rss.models.video import Video
 from youtube_rss.services.feed import build_rss_file
 from youtube_rss.services.source import (
-    generate_source_id_from_url,
     get_source_from_source_info_dict,
     get_source_info_dict,
     get_source_videos_from_source_info_dict,
@@ -46,7 +45,6 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
             source_id=source_id,
             url=url,
             extract_flat=True,
-            use_cache=False,
         )
         source = await get_source_from_source_info_dict(source_info_dict=source_info_dict)
 
@@ -74,7 +72,6 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
             source_id=source_id,
             url=db_source.url,
             extract_flat=True,
-            use_cache=False,
         )
 
         # Update Source Videos from Fetched Videos
