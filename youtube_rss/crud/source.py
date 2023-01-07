@@ -54,9 +54,7 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
         db_source = await self.create(source)
 
         # Fetch video information from yt-dlp for new videos
-        await refresh_videos(videos=db_source.videos)
-
-        return db_source
+        return await self.fetch_source(source_id=source_id)
 
     async def fetch_source(self, source_id: str) -> Source:
         """Fetch new data from yt-dlp for the source and update the source in the database.
