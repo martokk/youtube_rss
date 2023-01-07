@@ -23,7 +23,7 @@ async def get_rss(source_id: str) -> Response:
 
 
 @router.put("/{source_id}", response_class=HTMLResponse)
-async def update_rss(source_id: str) -> Response:
+async def build_rss(source_id: str) -> Response:
     """
     Builds a new rss file for source_id and returns it as a Response.
     """

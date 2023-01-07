@@ -4,6 +4,8 @@ import pickle
 from datetime import datetime
 from pathlib import Path
 
+from dateutil import tz
+
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
 from youtube_rss.core.debug_helpers import log_function_enter_exit
 from youtube_rss.models.source import Source, SourceOrderBy, generate_source_id_from_url
@@ -53,7 +55,7 @@ async def get_source_info_dict(
         dict: The info dictionary for the Source
 
     """
-    source_id = await generate_source_id_from_url(url=url)
+    source_id = source_id or await generate_source_id_from_url(url=url)
     cache_file = Path(SOURCE_INFO_CACHE_PATH / source_id)
 
     # Load Cache
@@ -62,11 +64,12 @@ async def get_source_info_dict(
 
     # Get info_dict from yt-dlp
     ydl_opts = await get_source_ydl_opts(extract_flat=extract_flat)
-    info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts)
+    _source_info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts)
+    _source_info_dict["source_id"] = source_id
 
     # Save Pickle
-    cache_file.write_bytes(pickle.dumps(info_dict))
-    return info_dict
+    cache_file.write_bytes(pickle.dumps(_source_info_dict))
+    return _source_info_dict
 
 
 async def get_source_from_source_info_dict(source_info_dict: dict[str, Any]) -> Source:
@@ -104,12 +107,16 @@ async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, An
     """
     entries = source_info_dict["entries"]
     playlists = entries if entries[0].get("entries") else [entries]
+
     return [
         Video(
+            source_id=source_info_dict["source_id"],
             title=video["title"],
             description=video["description"],
             url=video.get("webpage_url", video["url"]),
-            released_at=datetime.strptime(video.get("upload_date"), "%Y%m%d")
+            released_at=datetime.strptime(video.get("upload_date"), "%Y%m%d").replace(
+                tzinfo=tz.tzutc()
+            )
             if video.get("upload_date")
             else None,
             media_url=None,

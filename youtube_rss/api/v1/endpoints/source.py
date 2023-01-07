@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
 
-from youtube_rss.core.debug_helpers import log_function_enter_exit
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError, RecordNotFoundError
 from youtube_rss.crud.source import source_crud
 from youtube_rss.models.source import Source, SourceCreate, SourceRead
@@ -68,6 +67,28 @@ async def delete(id: str) -> None:
     """
     try:
         return await crud.delete(id=id)
+    except RecordNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"
+        ) from exc
+
+
+@router.put("/{source_id}/fetch", response_model=SourceRead)
+async def fetch_source(source_id: str) -> Source:
+    """
+    Fetches new data from yt-dlp and updates a source on the server.
+
+    Args:
+        source_id: The ID of the source to update.
+
+    Returns:
+        The updated source.
+
+    Raises:
+        HTTPException: If the source was not found.
+    """
+    try:
+        return await source_crud.fetch_source(source_id=source_id)
     except RecordNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"

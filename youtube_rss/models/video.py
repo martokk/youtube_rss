@@ -59,6 +59,11 @@ class VideoCreate(VideoBase):
         values["updated_at"] = datetime.datetime.now(tz=tz.tzutc())
         return values
 
+    @root_validator
+    def create_released_at(cls, values: dict[str, Any | None]) -> dict[str, Any]:
+        values["released_at"] = values["released_at"]
+        return values
+
 
 class VideoRead(VideoBase):
     source_id: str = Field(default=None, foreign_key="source.id")

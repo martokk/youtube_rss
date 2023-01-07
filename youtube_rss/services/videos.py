@@ -1,7 +1,7 @@
 from typing import Any
 
 import pickle
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from youtube_rss.models.video import Video, generate_video_id_from_url
@@ -65,6 +65,9 @@ async def get_video_from_video_info_dict(video_info_dict: dict[str, Any]) -> Vid
     media_filesize = format_info_dict.get("filesize") or format_info_dict.get("filesize_approx", 0)
     if not media_filesize:
         print(f"{format_info_dict.get('filesize')=} - {format_info_dict.get('filesize_approx')=}")
+    released_at = datetime.strptime(video_info_dict["upload_date"], "%Y%m%d").replace(
+        tzinfo=timezone.utc
+    )
     return Video(
         title=video_info_dict["title"],
         uploader=video_info_dict["uploader"],
@@ -75,7 +78,7 @@ async def get_video_from_video_info_dict(video_info_dict: dict[str, Any]) -> Vid
         media_url=format_info_dict["url"],
         media_filesize=media_filesize,
         thumbnail=video_info_dict["thumbnail"],
-        released_at=datetime.strptime(video_info_dict["upload_date"], "%Y%m%d"),
+        released_at=released_at,
     )
 
 

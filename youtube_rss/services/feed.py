@@ -48,16 +48,17 @@ class SourceFeedGenerator(FeedGenerator):
 
         # Generate Feed Posts
         for video in source.videos:
+            published_at = video.released_at or video.added_at
             post = self.add_entry()
-            post.author(video.uploader)
+            post.author({"name": video.uploader})
             post.id(video.id)
             post.title(video.title)
             post.link(href=video.url)
             post.description(video.description)
             post.enclosure(
-                url=video.feed_media_url, length=video.media_filesize, type="video/mp4"
+                url=video.feed_media_url, length=str(video.media_filesize), type="video/mp4"
             )  # TODO: Handle non-mp4 files as well
-            post.published(video.released_at)
+            post.published(published_at.replace(tzinfo=tz.tzutc()))
             post.podcast.itunes_duration(  # type: ignore # pylint: disable=no-member
                 itunes_duration=video.duration
             )
@@ -70,11 +71,11 @@ class SourceFeedGenerator(FeedGenerator):
         Saves a generated feed to file.
         """
         self.rss_file(filename=self.rss_file_path, encoding="UTF-8", pretty=True)
-        return await self.rss_file_path
+        return self.rss_file_path
 
 
 # RSS File
-async def get_rss_file_path(source_id: str) -> Path:
+def get_rss_file_path(source_id: str) -> Path:
     """
     Returns the file path for a 'source_id' rss file.
     """
@@ -85,7 +86,7 @@ async def get_rss_file(source_id: str) -> Path:
     """
     Returns a validated rss file.
     """
-    rss_file = await get_rss_file_path(source_id=source_id)
+    rss_file = get_rss_file_path(source_id=source_id)
 
     # Validate RSS File exists
     if not rss_file.exists():
@@ -96,7 +97,7 @@ async def get_rss_file(source_id: str) -> Path:
 
 
 async def delete_rss_file(source_id: str):
-    rss_file = await get_rss_file_path(source_id=source_id)
+    rss_file = get_rss_file_path(source_id=source_id)
     rss_file.unlink()
 
 
