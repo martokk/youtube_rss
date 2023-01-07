@@ -1,11 +1,10 @@
 from typing import Any
 
-from datetime import datetime
+import datetime
 
 from dateutil import tz
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
-from youtube_rss.core.debug_helpers import log_function_enter_exit
 from youtube_rss.models.source import Source, SourceOrderBy
 from youtube_rss.models.video import Video
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE, get_info_dict
@@ -101,20 +100,20 @@ async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, An
     """
     entries = source_info_dict["entries"]
     playlists = entries if entries[0].get("entries") else [entries]
-
     return [
         Video(
             source_id=source_info_dict["source_id"],
             title=video["title"],
             description=video["description"],
             url=video.get("webpage_url", video["url"]),
-            released_at=datetime.strptime(video.get("upload_date"), "%Y%m%d").replace(
+            released_at=datetime.datetime.strptime(video.get("upload_date"), "%Y%m%d").replace(
                 tzinfo=tz.tzutc()
             )
             if video.get("upload_date")
             else None,
             media_url=None,
             media_filesize=None,
+            added_at=datetime.datetime.now(tz=tz.tzutc()),
         )
         for playlist in playlists
         for video in playlist.get("entries", [])

@@ -48,7 +48,6 @@ class Video(VideoBase, table=True):
             "url": sanitized_url,
             "id": video_id,
             "feed_media_url": feed_media_url,
-            "added_at": values.get("added_at", datetime.datetime.now(tz=tz.tzutc())),
             "updated_at": datetime.datetime.now(tz=tz.tzutc()),
         }
 
