@@ -135,7 +135,7 @@ async def refresh_all_sources() -> list[Source]:
         The list of refreshed Sources.
     """
     sources = await source_crud.get_all()
-    return refresh_sources(sources=sources)
+    return await refresh_sources(sources=sources)
 
 
 @timeit

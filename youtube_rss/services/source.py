@@ -30,7 +30,6 @@ async def get_source_ydl_opts(extract_flat: bool) -> dict[str, Any]:
     }
 
 
-@log_function_enter_exit()
 async def get_source_info_dict(
     source_id: str | None,
     url: str,
