@@ -12,5 +12,5 @@ engine = create_engine(database_url, echo=DATABASE_ECHO, connect_args=connect_ar
 
 async def create_db_and_tables() -> None:
     """Creates all SQLModel databases if not already created."""
-    logger.info("Initializing database...")
+    logger.debug("Initializing database...")
     SQLModel.metadata.create_all(engine)

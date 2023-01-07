@@ -40,5 +40,5 @@ def main(
     """Main entrypoint into application"""
 
     # Start Uvicorn
-    logger.info("Starting Server...")
+    logger.debug("Starting Server...")
     start_server()

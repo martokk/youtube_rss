@@ -8,5 +8,6 @@ logger.add(LOG_FILE, level="TRACE", rotation="50 MB")
 
 
 if __name__ == "__main__":
-    logger.info(f"Starting Typer App: '{typer_app.info.name}'...")
+    logger.info("--- Start ---")
+    logger.debug(f"Starting Typer App: '{typer_app.info.name}'...")
     typer_app()

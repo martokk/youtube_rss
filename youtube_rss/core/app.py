@@ -8,9 +8,13 @@ from youtube_rss.config import REFRESH_SOURCES_INTERVAL_MINUTES, REFRESH_VIDEOS_
 from youtube_rss.crud.source import refresh_all_sources
 from youtube_rss.crud.video import refresh_all_videos
 from youtube_rss.db.database import create_db_and_tables
-from youtube_rss.paths import FEEDS_PATH
+from youtube_rss.paths import FEEDS_PATH, LOG_FILE
+
+# Configure Loguru Logger
+logger.add(LOG_FILE, level="TRACE", rotation="50 MB")
 
 # Initialize FastAPI App
+
 app = FastAPI()
 app.debug = True
 app.include_router(api_router)
@@ -23,6 +27,8 @@ async def on_startup() -> None:
     On Startup:
         - create database and tables.
     """
+    logger.info("--- Start FastAPI ---")
+    logger.debug("Starting FastAPI App...")
     return await create_db_and_tables()
 
 
@@ -32,7 +38,7 @@ async def repeating_refresh_sources() -> None:
     """
     Fetches new data from yt-dlp for all Videos that meet criteria.
     """
-    logger.info("Refreshing Sources...")
+    logger.debug("Refreshing Sources...")
     refreshed_videos = await refresh_all_sources()
     logger.success(f"Completed refreshing {len(refreshed_videos)} Sources from yt-dlp.")
 
@@ -43,7 +49,7 @@ async def repeating_refresh_videos() -> None:
     """
     Fetches new data from yt-dlp for all Videos that meet criteria.
     """
-    logger.info("Refreshing Videos...")
+    logger.debug("Refreshing Videos...")
     refreshed_videos = await refresh_all_videos(older_than_hours=8)
     logger.success(f"Completed refreshing {len(refreshed_videos)} Videos from yt-dlp.")
 

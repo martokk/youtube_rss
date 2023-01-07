@@ -10,7 +10,7 @@ logger.bind()
 
 
 def start_server() -> None:
-    logger.info("Starting uvicorn server.")
+    logger.debug("Starting uvicorn server...")
     uvicorn.run(
         "youtube_rss.core.app:app",
         host=SERVER_IP,
