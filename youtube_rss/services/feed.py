@@ -48,7 +48,12 @@ class SourceFeedGenerator(FeedGenerator):
 
         # Generate Feed Posts
         for video in source.videos:
-            published_at = video.released_at or video.added_at
+
+            published_at = self._get_published_date(
+                added_at=video.added_at, released_at=video.released_at
+            )
+
+            # Set Post
             post = self.add_entry()
             post.author({"name": video.uploader})
             post.id(video.id)
@@ -65,6 +70,23 @@ class SourceFeedGenerator(FeedGenerator):
             post.podcast.itunes_image(  # type: ignore # pylint: disable=no-member
                 itunes_image=f"{video.thumbnail}/?=.jpg"
             )  # type: ignore # pylint: disable=no-member
+
+    def _get_published_date(
+        self, added_at: datetime.datetime, released_at: datetime.datetime | None
+    ) -> datetime.datetime:
+        """
+        Returns an estimated published date.
+
+        Args:
+            added_at: The date the video was added to the database.
+            released_at: The date the video was released on YouTube.
+
+        Returns:
+            The latest date between `released_at` and `added_at`.
+        """
+        if not released_at or released_at.date() == added_at.date():
+            return added_at
+        return released_at
 
     async def save(self) -> Path:
         """
