@@ -16,11 +16,12 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
     def __init__(self, session: Session) -> None:
         super().__init__(model=Video, session=session)
 
-    async def create_video_from_url(self, url: str) -> Video:
+    async def create_video_from_url(self, url: str, source_id: str) -> Video:
         """Create a new video from a URL.
 
         Args:
             url: The URL to create the video from.
+            source_id: The id of the Source the video belongs to.
 
         Returns:
             The created video.
@@ -28,7 +29,7 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
         Raises:
             RecordAlreadyExistsError: If a video already exists for the given URL.
         """
-        video_id = generate_video_id_from_url(url=url)
+        video_id = await generate_video_id_from_url(url=url)
 
         # Check if the video already exists
         db_video = await self.get_or_none(id=video_id)
@@ -37,10 +38,12 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
 
         # Fetch video information from yt-dlp and create the video object
         video_info_dict = await get_video_info_dict(url=url)
-        video = await get_video_from_video_info_dict(video_info_dict=video_info_dict)
+        video = await get_video_from_video_info_dict(
+            video_info_dict=video_info_dict, source_id=source_id
+        )
 
         # Save the video to the database
-        return await self.update(VideoCreate(**video.dict()), id=video.id)
+        return await self.create(video)
 
     async def fetch_video(self, video_id: str) -> Video:
         """Fetches new data from yt-dlp for the video.
@@ -53,10 +56,13 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
         """
         # Get the video from the database
         db_video = await self.get(id=video_id)
+        source_id = db_video.source_id
 
         # Fetch video information from yt-dlp and create the video object
         video_info_dict = await get_video_info_dict(url=db_video.url)
-        video = await get_video_from_video_info_dict(video_info_dict=video_info_dict)
+        video = await get_video_from_video_info_dict(
+            video_info_dict=video_info_dict, source_id=source_id
+        )
 
         # Update the video in the database and return it
         return await self.update(VideoCreate(**video.dict()), id=video.id)

@@ -1,7 +1,8 @@
-from typing import Any
+from typing import Any, Type
 
 from loguru import logger
 from yt_dlp import YoutubeDL
+from yt_dlp.extractor.common import InfoExtractor
 
 YDL_OPTS_BASE: dict[str, Any] = {
     "logger": logger,
@@ -13,7 +14,10 @@ YDL_OPTS_BASE: dict[str, Any] = {
 
 
 async def get_info_dict(
-    url: str, ydl_opts: dict[str, Any], ie_key: str | None = None
+    url: str,
+    ydl_opts: dict[str, Any],
+    ie_key: str | None = None,
+    custom_extractors: list[Type[InfoExtractor]] | None = None,
 ) -> dict[str, Any]:
     """
     Use YouTube-DL to get the info dictionary for a given URL.
@@ -31,11 +35,25 @@ async def get_info_dict(
         ValueError: If the info dictionary could not be retrieved.
     """
     with YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(url, download=False, ie_key=ie_key)
-        info_dict["url"] = url
 
-    if info_dict is None:
-        raise ValueError(
-            f"yt-dlp did not download a info_dict object. {info_dict=} {url=} {ydl_opts=}"
-        )
+        # Add custom_extractors
+        if custom_extractors:
+            for custom_extractor in custom_extractors:
+                ydl.add_info_extractor(custom_extractor())
+
+        # Get Info Dict
+        info_dict = ydl.extract_info(url, download=False, ie_key=ie_key)
+        if info_dict is None:
+            raise ValueError(
+                f"yt-dlp did not download a info_dict object. {info_dict=} {url=} {ie_key=} {ydl_opts=}"
+            )
+
+        # Append Metadata to info_dict
+        info_dict["metadata"] = {
+            "url": url,
+            "ydl_opts": ydl_opts,
+            "ie_key": ie_key,
+            "custom_extractors": custom_extractors,
+        }
+
     return info_dict

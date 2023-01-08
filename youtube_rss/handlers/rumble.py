@@ -1,61 +1,63 @@
 from typing import Any
 
 import datetime
-import re
 
 from dateutil import tz
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
+from youtube_rss.handlers.extractors.rumble import CustomRumbleChannelIE, CustomRumbleEmbedIE
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE
 
 from .base import ServiceHandler
 
+# import re
 
-class YoutubeHandler(ServiceHandler):
-    USE_PROXY = True
+
+class RumbleHandler(ServiceHandler):
+    USE_PROXY = False
     MEDIA_URL_REFRESH_INTERVAL = 60 * 60 * 8  # 8 Hours
-    DOMAINS = ["youtube.com"]
-    YTDLP_CUSTOM_EXTRACTORS = []
-    YDL_OPT_ALLOWED_EXTRACTORS = []
+    DOMAINS = ["rumble.com"]
+    YTDLP_CUSTOM_EXTRACTORS = [CustomRumbleChannelIE, CustomRumbleEmbedIE]
+    YDL_OPT_ALLOWED_EXTRACTORS = ["CustomRumbleEmbed", "CustomRumbleChannel"]
 
-    def sanitize_video_url(self, url: str) -> str:
-        """
-        Sanitizes the url to a standard format
+    # def sanitize_video_url(self, url: str) -> str:
+    #     """
+    #     Sanitizes the url to a standard format
 
-        Args:
-            url: The URL to be sanitized
+    #     Args:
+    #         url: The URL to be sanitized
 
-        Returns:
-            The sanitized URL.
-        """
-        url = self.force_watch_v_format(url=url)
-        return super().sanitize_video_url(url=url)
+    #     Returns:
+    #         The sanitized URL.
+    #     """
+    #     url = await self.force_watch_v_format(url=url)
+    #     return await super().sanitize_video_url(url=url)
 
-    def force_watch_v_format(self, url: str) -> str:
-        """
-        Extracts the YouTube video ID from a URL and returns the URL
-        formatted like `https://www.youtube.com/watch?v=VIDEO_ID`.
+    # def force_watch_v_format(self, url: str) -> str:
+    #     """
+    #     Extracts the YouTube video ID from a URL and returns the URL
+    #     formatted like `https://www.youtube.com/watch?v=VIDEO_ID`.
 
-        Args:
-            url: The URL of the YouTube video.
+    #     Args:
+    #         url: The URL of the YouTube video.
 
-        Returns:
-            The formatted URL.
+    #     Returns:
+    #         The formatted URL.
 
-        Raises:
-            ValueError: If the URL is not a valid YouTube video URL.
-        """
-        match = re.search(r"(?<=shorts/).*", url)
-        if match:
-            video_id = match.group()
-        else:
-            match = re.search(r"(?<=watch\?v=).*", url)
-            if match:
-                video_id = match.group()
-            else:
-                raise ValueError("Invalid YouTube video URL")
+    #     Raises:
+    #         ValueError: If the URL is not a valid YouTube video URL.
+    #     """
+    #     match = re.search(r"(?<=shorts/).*", url)
+    #     if match:
+    #         video_id = match.group()
+    #     else:
+    #         match = re.search(r"(?<=watch\?v=).*", url)
+    #         if match:
+    #             video_id = match.group()
+    #         else:
+    #             raise ValueError("Invalid YouTube video URL")
 
-        return f"https://www.youtube.com/watch?v={video_id}"
+    #     return f"https://www.youtube.com/watch?v={video_id}"
 
     def get_source_ydl_opts(self, extract_flat: bool) -> dict[str, Any]:
         """
@@ -73,6 +75,7 @@ class YoutubeHandler(ServiceHandler):
             "extract_flat": extract_flat,
             "playlistend": BUILD_FEED_RECENT_VIDEOS,
             "dateafter": BUILD_FEED_DATEAFTER,
+            "allowed_extractors": self.YDL_OPT_ALLOWED_EXTRACTORS,
         }
 
     def map_source_info_dict_to_source_dict(
@@ -89,9 +92,9 @@ class YoutubeHandler(ServiceHandler):
             A Source object.
         """
         return {
-            "url": source_info_dict["url"],
-            "name": source_info_dict["title"],
-            "author": source_info_dict["uploader"],
+            "url": source_info_dict["metadata"]["url"],
+            "name": source_info_dict["id"],
+            "author": source_info_dict["id"],
             "logo": source_info_dict["thumbnails"][2]["url"],
             "ordered_by": "release",
             "description": source_info_dict["description"],
@@ -113,23 +116,16 @@ class YoutubeHandler(ServiceHandler):
         Returns:
             A `Video` dictionary created from the `entry_info_dict`.
         """
-        released_at = (
-            datetime.datetime.strptime(entry_info_dict["upload_date"], "%Y%m%d").replace(
-                tzinfo=tz.tzutc()
-            )
-            if entry_info_dict.get("upload_date")
-            else None
-        )
         url = entry_info_dict.get("webpage_url", entry_info_dict["url"])
         return {
             "source_id": source_id,
-            "title": entry_info_dict["title"],
-            "description": entry_info_dict["description"],
             "url": url,
-            "released_at": released_at,
+            "added_at": datetime.datetime.now(tz=tz.tzutc()),
+            "title": None,
+            "description": None,
+            "released_at": None,
             "media_url": None,
             "media_filesize": None,
-            "added_at": datetime.datetime.now(tz=tz.tzutc()),
         }
 
     def map_video_info_dict_entity_to_video_dict(
@@ -150,16 +146,14 @@ class YoutubeHandler(ServiceHandler):
         media_filesize = format_info_dict.get("filesize") or format_info_dict.get(
             "filesize_approx", 0
         )
-        released_at = datetime.datetime.strptime(entry_info_dict["upload_date"], "%Y%m%d").replace(
-            tzinfo=tz.tzutc()
-        )
+        released_at = datetime.datetime.utcfromtimestamp(entry_info_dict["timestamp"])
         return {
             "title": entry_info_dict["title"],
             "uploader": entry_info_dict["uploader"],
-            "uploader_id": entry_info_dict["uploader_id"],
-            "description": entry_info_dict["description"],
+            "uploader_id": entry_info_dict["uploader"],
+            "description": None,
             "duration": entry_info_dict["duration"],
-            "url": entry_info_dict["webpage_url"],
+            "url": entry_info_dict["original_url"],
             "media_url": format_info_dict["url"],
             "media_filesize": media_filesize,
             "thumbnail": entry_info_dict["thumbnail"],

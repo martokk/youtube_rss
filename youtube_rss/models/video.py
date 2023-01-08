@@ -16,13 +16,14 @@ if TYPE_CHECKING:
 
 class VideoBase(SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
+    source_id: str = Field(default=None, foreign_key="source.id", nullable=False)
     handler: str = Field(default=None, nullable=False)
-    uploader: str = Field(default=None)
-    uploader_id: str = Field(default=None)
-    title: str = Field(default=None)
-    description: str = Field(default=None)
-    duration: int = Field(default=None)
-    thumbnail: str = Field(default=None)
+    uploader: str | None = Field(default=None)
+    uploader_id: str | None = Field(default=None)
+    title: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    duration: int | None = Field(default=None)
+    thumbnail: str | None = Field(default=None)
     url: str = Field(default=None)
     media_url: str | None = Field(default=None)
     feed_media_url: str | None = Field(default=None)
@@ -33,7 +34,6 @@ class VideoBase(SQLModel):
 
 
 class Video(VideoBase, table=True):
-    source_id: str = Field(default=None, foreign_key="source.id")
     source: "Source" = Relationship(back_populates="videos")
 
     @root_validator(pre=True)
@@ -50,6 +50,12 @@ class Video(VideoBase, table=True):
             "feed_media_url": feed_media_url,
             "updated_at": datetime.datetime.now(tz=tz.tzutc()),
         }
+
+    @root_validator
+    def create_added_at(cls, values: dict[str, Any | None]) -> dict[str, Any]:
+        if not values.get("added_at"):
+            values["added_at"] = datetime.datetime.now(tz=tz.tzutc())
+        return values
 
 
 class VideoCreate(VideoBase):
@@ -68,7 +74,7 @@ class VideoRead(VideoBase):
     source_id: str = Field(default=None, foreign_key="source.id")
 
 
-def generate_video_id_from_url(url: str) -> str:
+async def generate_video_id_from_url(url: str) -> str:
     handler = get_handler_from_url(url=url)
     sanitized_video_url = handler.sanitize_video_url(url=url)
     return generate_uuid_from_url(url=sanitized_video_url)

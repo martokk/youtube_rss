@@ -17,7 +17,7 @@ async def create(in_obj: ModelCreateClass) -> ModelClass:
     Create a new item.
     """
     try:
-        return await crud.create_video_from_url(url=in_obj.url)
+        return await crud.create_video_from_url(url=in_obj.url, source_id=in_obj.source_id)
     except RecordAlreadyExistsError as exc:
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Video already exists") from exc
 

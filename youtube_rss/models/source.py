@@ -44,7 +44,7 @@ class Source(SourceBase, table=True):
     )
 
     @root_validator(pre=True)
-    def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:
+    async def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:
         handler = get_handler_from_url(url=values["url"])
         sanitized_url = handler.sanitize_source_url(url=values["url"])
         source_id = generate_uuid_from_url(url=sanitized_url)

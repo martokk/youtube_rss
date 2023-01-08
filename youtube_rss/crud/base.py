@@ -117,6 +117,7 @@ class BaseCRUD(Generic[ModelClass, ModelCreateClass, ModelReadClass]):
             The updated object.
 
         """
+
         db_obj = await self.get(*args, **kwargs)
 
         in_obj_update_data = in_obj.dict(exclude_unset=True, exclude_none=True)

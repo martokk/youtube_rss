@@ -20,7 +20,7 @@ async def reverse_proxy_video_id(video_id: str, request: Request) -> Response:
             status_code=status.HTTP_202_ACCEPTED,
             detail="The server has not yet retrieved a media_url from yt-dlp.",
         )
-    handler = get_handler_from_string(handler_string=video.handler)
+    handler = await get_handler_from_string(handler_string=video.handler)
     if handler.USE_PROXY:
         return await reverse_proxy(url=video.media_url, request=request)
     return RedirectResponse(url=video.media_url)
