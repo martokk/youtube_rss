@@ -59,7 +59,7 @@ class SourceFeedGenerator(FeedGenerator):
             post.id(video.id)
             post.title(video.title)
             post.link(href=video.url)
-            post.description(video.description)
+            post.description(video.description or " ")
             post.enclosure(
                 url=video.feed_media_url, length=str(video.media_filesize), type="video/mp4"
             )  # TODO: Handle non-mp4 files as well

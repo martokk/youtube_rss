@@ -97,7 +97,7 @@ class RumbleHandler(ServiceHandler):
             "author": source_info_dict["uploader"],
             "logo": source_info_dict["thumbnail"],
             "ordered_by": "release",
-            "description": None,
+            "description": f"{source_info_dict['uploader']}'s Rumble Channel",
             "videos": source_videos,
             "extractor": source_info_dict["extractor_key"],
         }
@@ -151,7 +151,9 @@ class RumbleHandler(ServiceHandler):
             "title": entry_info_dict["title"],
             "uploader": entry_info_dict["uploader"],
             "uploader_id": entry_info_dict["uploader"],
-            "description": None,
+            "description": entry_info_dict.get(
+                "description", f"Rumble video uploaded by {entry_info_dict['uploader']}"
+            ),
             "duration": entry_info_dict["duration"],
             "url": entry_info_dict["original_url"],
             "media_url": format_info_dict["url"],
