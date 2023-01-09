@@ -1,11 +1,12 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from loguru import logger
 
 from youtube_rss.api.v1.api import api_router
 from youtube_rss.config import REFRESH_SOURCES_INTERVAL_MINUTES, REFRESH_VIDEOS_INTERVAL_MINUTES
-from youtube_rss.crud.source import refresh_all_sources
+from youtube_rss.crud.source import refresh_all_sources, source_crud
 from youtube_rss.crud.video import refresh_all_videos
 from youtube_rss.db.database import create_db_and_tables
 from youtube_rss.paths import FEEDS_PATH, LOG_FILE
@@ -55,8 +56,20 @@ async def repeating_refresh_videos() -> None:
 
 
 @app.get("/")
-async def root() -> dict[str, str]:
+async def root() -> HTMLResponse:
     """
-    Server root, return simple api status.
+    Server root. Returns html response of all sources.
+
+    Parameters:
+        sources: List of sources to display
+
+    Returns:
+        HTMLResponse: HTML page with list of sources
     """
-    return {"api_status": "OK"}
+    sources = await source_crud.get_all() or []
+    sources_html = "".join(
+        f'<li><a href="{source.feed_url}">{source.name}</a>  |  <a href="{source.url}">{source.url}</a></li>'
+        for source in sources
+    )
+    html = f"<html><header><title>RSS Feeds</title></header><body><h2>RSS Feeds</h2><ul>{sources_html}</ul></body></html>"
+    return HTMLResponse(html)

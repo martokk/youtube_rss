@@ -89,7 +89,7 @@ class YoutubeHandler(ServiceHandler):
             A Source object.
         """
         return {
-            "url": source_info_dict["url"],
+            "url": source_info_dict["metadata"]["url"],
             "name": source_info_dict["title"],
             "author": source_info_dict["uploader"],
             "logo": source_info_dict["thumbnails"][2]["url"],

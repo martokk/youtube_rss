@@ -117,13 +117,16 @@ class RumbleHandler(ServiceHandler):
             A `Video` dictionary created from the `entry_info_dict`.
         """
         url = entry_info_dict.get("webpage_url", entry_info_dict["url"])
+        released_at = datetime.datetime.utcfromtimestamp(entry_info_dict["timestamp"])
         return {
             "source_id": source_id,
             "url": url,
             "added_at": datetime.datetime.now(tz=tz.tzutc()),
-            "title": None,
-            "description": None,
-            "released_at": None,
+            "title": entry_info_dict["title"],
+            "description": entry_info_dict["title"],
+            "duration": entry_info_dict["duration"],
+            "thumbnail": entry_info_dict["thumbnail"],
+            "released_at": released_at,
             "media_url": None,
             "media_filesize": None,
         }
