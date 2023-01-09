@@ -92,12 +92,12 @@ class RumbleHandler(ServiceHandler):
             A Source object.
         """
         return {
-            "url": source_info_dict["metadata"]["url"],
-            "name": source_info_dict["id"],
-            "author": source_info_dict["id"],
-            "logo": source_info_dict["thumbnails"][2]["url"],
+            "url": source_info_dict["url"],
+            "name": source_info_dict["title"],
+            "author": source_info_dict["uploader"],
+            "logo": source_info_dict["thumbnail"],
             "ordered_by": "release",
-            "description": source_info_dict["description"],
+            "description": None,
             "videos": source_videos,
             "extractor": source_info_dict["extractor_key"],
         }

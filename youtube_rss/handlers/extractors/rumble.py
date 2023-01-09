@@ -1,166 +1,19 @@
-import itertools
+# import itertools
 import re
 
 from yt_dlp.compat import compat_HTTPError
-from yt_dlp.extractor.common import InfoExtractor
-from yt_dlp.utils import ExtractorError, int_or_none, parse_iso8601, traverse_obj, unescapeHTML
+from yt_dlp.extractor.rumble import RumbleChannelIE, RumbleEmbedIE
+from yt_dlp.utils import (
+    ExtractorError,
+    int_or_none,
+    parse_duration,
+    parse_iso8601,
+    traverse_obj,
+    unescapeHTML,
+)
 
 
-class CustomRumbleEmbedIE(InfoExtractor):
-    _VALID_URL = r"https?://(?:www\.)?rumble\.com/embed/(?:[0-9a-z]+\.)?(?P<id>[0-9a-z]+)"
-    _EMBED_REGEX = [
-        rf'(?:<(?:script|iframe)[^>]+\bsrc=|["\']embedUrl["\']\s*:\s*)["\'](?P<url>{_VALID_URL})'
-    ]
-    _TESTS = [
-        {
-            "url": "https://rumble.com/embed/v5pv5f",
-            "md5": "36a18a049856720189f30977ccbb2c34",
-            "info_dict": {
-                "id": "v5pv5f",
-                "ext": "mp4",
-                "title": "WMAR 2 News Latest Headlines | October 20, 6pm",
-                "timestamp": 1571611968,
-                "upload_date": "20191020",
-                "channel_url": "https://rumble.com/c/WMAR",
-                "channel": "WMAR",
-                "thumbnail": "https://sp.rmbl.ws/s8/1/5/M/z/1/5Mz1a.OvCc-small-WMAR-2-News-Latest-Headline.jpg",
-                "duration": 234,
-                "uploader": "WMAR",
-                "live_status": "not_live",
-                "description": "md5:6c791446ac12dea994674d3976a3cdd5",
-                "view_count": int,
-            },
-        },
-        {
-            "url": "https://rumble.com/embed/vslb7v",
-            "md5": "7418035de1a30a178b8af34dc2b6a52b",
-            "info_dict": {
-                "id": "vslb7v",
-                "ext": "mp4",
-                "title": "Defense Sec. says US Commitment to NATO Defense 'Ironclad'",
-                "timestamp": 1645142135,
-                "upload_date": "20220217",
-                "channel_url": "https://rumble.com/c/CyberTechNews",
-                "channel": "CTNews",
-                "thumbnail": "https://sp.rmbl.ws/s8/6/7/i/9/h/7i9hd.OvCc.jpg",
-                "duration": 901,
-                "uploader": "CTNews",
-                "live_status": "not_live",
-            },
-        },
-        {
-            "url": "https://rumble.com/embed/vunh1h",
-            "info_dict": {
-                "id": "vunh1h",
-                "ext": "mp4",
-                "title": "‘Gideon, op zoek naar de waarheid’ including ENG SUBS",
-                "timestamp": 1647197663,
-                "upload_date": "20220313",
-                "channel_url": "https://rumble.com/user/BLCKBX",
-                "channel": "BLCKBX",
-                "thumbnail": r"re:https://.+\.jpg",
-                "duration": 5069,
-                "uploader": "BLCKBX",
-                "live_status": "not_live",
-                "subtitles": {
-                    "en": [{"url": r"re:https://.+\.vtt", "name": "English", "ext": "vtt"}]
-                },
-            },
-            "params": {"skip_download": True},
-        },
-        {
-            "url": "https://rumble.com/embed/v1essrt",
-            "info_dict": {
-                "id": "v1essrt",
-                "ext": "mp4",
-                "title": "startswith:lofi hip hop radio - beats to relax/study",
-                "timestamp": 1661519399,
-                "upload_date": "20220826",
-                "channel_url": "https://rumble.com/c/LofiGirl",
-                "channel": "Lofi Girl",
-                "thumbnail": r"re:https://.+\.jpg",
-                "duration": None,
-                "uploader": "Lofi Girl",
-                "live_status": "is_live",
-            },
-            "params": {"skip_download": True},
-        },
-        {
-            "url": "https://rumble.com/embed/v1amumr",
-            "info_dict": {
-                "id": "v1amumr",
-                "ext": "webm",
-                "fps": 60,
-                "title": "Turning Point USA 2022 Student Action Summit DAY 1  - Rumble Exclusive Live",
-                "timestamp": 1658518457,
-                "upload_date": "20220722",
-                "channel_url": "https://rumble.com/c/RumbleEvents",
-                "channel": "Rumble Events",
-                "thumbnail": r"re:https://.+\.jpg",
-                "duration": 16427,
-                "uploader": "Rumble Events",
-                "live_status": "was_live",
-            },
-            "params": {"skip_download": True},
-        },
-        {
-            "url": "https://rumble.com/embed/ufe9n.v5pv5f",
-            "only_matching": True,
-        },
-    ]
-
-    _WEBPAGE_TESTS = [
-        {
-            "note": "Rumble embed",
-            "url": "https://rumble.com/vdmum1-moose-the-dog-helps-girls-dig-a-snow-fort.html",
-            "md5": "53af34098a7f92c4e51cf0bd1c33f009",
-            "info_dict": {
-                "id": "vb0ofn",
-                "ext": "mp4",
-                "timestamp": 1612662578,
-                "uploader": "LovingMontana",
-                "channel": "LovingMontana",
-                "upload_date": "20210207",
-                "title": "Winter-loving dog helps girls dig a snow fort ",
-                "channel_url": "https://rumble.com/c/c-546523",
-                "thumbnail": "https://sp.rmbl.ws/s8/1/5/f/x/x/5fxxb.OvCc.1-small-Moose-The-Dog-Helps-Girls-D.jpg",
-                "duration": 103,
-                "live_status": "not_live",
-            },
-        },
-        {
-            "note": "Rumble JS embed",
-            "url": "https://therightscoop.com/what-does-9-plus-1-plus-1-equal-listen-to-this-audio-of-attempted-kavanaugh-assassins-call-and-youll-get-it",
-            "md5": "4701209ac99095592e73dbba21889690",
-            "info_dict": {
-                "id": "v15eqxl",
-                "ext": "mp4",
-                "channel": "Mr Producer Media",
-                "duration": 92,
-                "title": "911 Audio From The Man Who Wanted To Kill Supreme Court Justice Kavanaugh",
-                "channel_url": "https://rumble.com/c/RichSementa",
-                "thumbnail": "https://sp.rmbl.ws/s8/1/P/j/f/A/PjfAe.OvCc-small-911-Audio-From-The-Man-Who-.jpg",
-                "timestamp": 1654892716,
-                "uploader": "Mr Producer Media",
-                "upload_date": "20220610",
-                "live_status": "not_live",
-            },
-        },
-    ]
-
-    @classmethod
-    def _extract_embed_urls(cls, url, webpage):
-        embeds = tuple(super()._extract_embed_urls(url, webpage))
-        if embeds:
-            return embeds
-        return [
-            f'https://rumble.com/embed/{mobj.group("id")}'
-            for mobj in re.finditer(
-                r'<script>\s*Rumble\(\s*"play"\s*,\s*{\s*[\'"]video[\'"]\s*:\s*[\'"](?P<id>[0-9a-z]+)[\'"]',
-                webpage,
-            )
-        ]
-
+class CustomRumbleEmbedIE(RumbleEmbedIE):
     def _real_extract(self, url):
         video_id = self._match_id(url)
         video = self._download_json(
@@ -280,39 +133,71 @@ class CustomRumbleEmbedIE(InfoExtractor):
         }
 
 
-class CustomRumbleChannelIE(InfoExtractor):
-    _VALID_URL = r"(?P<url>https?://(?:www\.)?rumble\.com/(?:c|user)/(?P<id>[^&?#$/]+))"
+class CustomRumbleChannelIE(RumbleChannelIE):
+    def entries(self, url, playlist_id, webpage, **kwargs):
+        try:
+            webpage = self._download_webpage(
+                f"{url}?page=1", playlist_id, note="Downloading page 1"
+            )
+        except ExtractorError as e:
+            if isinstance(e.cause, compat_HTTPError) and e.cause.code == 404:
+                return
+            raise
+        # for video_url in re.findall(r"class=video-item--a\s?href=([^>]+\.html)", webpage):
+        #     yield self._build_entry(video_url)
+        for container in re.findall(
+            r'<li class="video-listing-entry">(.+?)</li>', webpage, flags=re.DOTALL
+        ):
+            yield self._build_entry(container=container, **kwargs)
 
-    _TESTS = [
-        {
-            "url": "https://rumble.com/c/Styxhexenhammer666",
-            "playlist_mincount": 1160,
-            "info_dict": {
-                "id": "Styxhexenhammer666",
-            },
-        },
-        {
-            "url": "https://rumble.com/user/goldenpoodleharleyeuna",
-            "playlist_mincount": 4,
-            "info_dict": {
-                "id": "goldenpoodleharleyeuna",
-            },
-        },
-    ]
+    def _build_entry(self, container, **kwargs):
+        video_id = re.search(r"\/(v[^-]*)-", container).group(1)
+        video_url = re.search(r"class=video-item--a\s?href=([^>]+\.html)", container).group(1)
 
-    def entries(self, url, playlist_id):
-        for page in itertools.count(1):
-            try:
-                webpage = self._download_webpage(
-                    f"{url}?page={page}", playlist_id, note="Downloading page %d" % page
-                )
-            except ExtractorError as e:
-                if isinstance(e.cause, compat_HTTPError) and e.cause.code == 404:
-                    break
-                raise
-            for video_url in re.findall(r"class=video-item--a\s?href=([^>]+\.html)", webpage):
-                yield self.url_result("https://rumble.com" + video_url)
+        # title = re.search(r'title="([^\"]+)"', container).group(1)
+        title = re.search(r"class=video-item--title>([^\<]+)<\/h3>", container).group(1)
+        # description = re.search(r'<p class="description"\s*>(.+?)</p>', container).group(1)
+        timestamp = parse_iso8601(re.search(r'datetime=([^">]+)>', container).group(1))
+        thumbnail = re.search(r"src=([^\s>]+)", container).group(1)
+        duration = parse_duration(
+            re.search(r"class=video-item--duration data-value=([^\">]+)>", container).group(1)
+        )
+        return {
+            **kwargs,
+            **self.url_result("https://rumble.com" + video_url),
+            "id": video_id,
+            "display_id": video_id,
+            "title": title,
+            "description": None,
+            "timestamp": timestamp,
+            "thumbnail": thumbnail,
+            "duration": duration,
+        }
 
     def _real_extract(self, url):
         url, playlist_id = self._match_valid_url(url).groups()
-        return self.playlist_result(self.entries(url, playlist_id), playlist_id=playlist_id)
+        webpage = self._download_webpage(
+            f"{url}?page=1", note="Downloading webpage", video_id=playlist_id
+        )
+        thumbnail = re.search(r"class=listing-header--thumb src=([^\s>]+)", webpage).group(1)
+        channel = re.search(r"class=ellipsis-1>([^\">]+)<", webpage).group(1)
+        channel_id = re.search(r"href=\/c\/([^\">]+)", webpage).group(1)
+        channel_url = "https://rumble.com/c/" + channel_id
+        uploader = channel
+        uploader_id = channel_id
+        uploader_url = channel_url
+        kwargs = {
+            "url": url,
+            "thumbnail": thumbnail,
+            "description": None,
+            "title": f"{channel}'s Rumble Channel",
+            "channel": channel,
+            "channel_id": channel_id,
+            "channel_url": channel_url,
+            "uploader": uploader,
+            "uploader_id": uploader_id,
+            "uploader_url": uploader_url,
+        }
+        return self.playlist_result(
+            self.entries(url, playlist_id, webpage=webpage), playlist_id=playlist_id, **kwargs
+        )
