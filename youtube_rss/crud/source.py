@@ -1,4 +1,7 @@
+from typing import Any
+
 from loguru import logger
+from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import Session
 
 from youtube_rss.core.debug_helpers import timeit
@@ -7,7 +10,7 @@ from youtube_rss.crud.video import VideoCRUD, refresh_videos
 from youtube_rss.db.database import engine
 from youtube_rss.models.source import Source, SourceCreate, SourceRead, generate_source_id_from_url
 from youtube_rss.models.video import Video
-from youtube_rss.services.feed import build_rss_file
+from youtube_rss.services.feed import build_rss_file, delete_rss_file
 from youtube_rss.services.source import (
     get_source_from_source_info_dict,
     get_source_info_dict,
@@ -20,6 +23,15 @@ from .base import BaseCRUD
 class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
     def __init__(self, session: Session) -> None:
         super().__init__(model=Source, session=session)
+
+    async def delete(self, *args: BinaryExpression[Any], **kwargs: Any) -> None:
+        source_id = kwargs.get("id")
+        if source_id:
+            try:
+                await delete_rss_file(source_id=source_id)
+            except FileNotFoundError as e:
+                logger.warning(e)
+        return await super().delete(*args, **kwargs)
 
     async def create_source_from_url(self, url: str) -> Source:
         """Create a new source from a URL.

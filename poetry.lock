@@ -17,7 +17,7 @@ trio = ["trio (>=0.16,<0.22)"]
 
 [[package]]
 name = "astroid"
-version = "2.13.0"
+version = "2.13.2"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -25,6 +25,7 @@ python-versions = ">=3.7.2"
 
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
+typing-extensions = ">=4.0.0"
 wrapt = [
     {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
     {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
@@ -664,7 +665,7 @@ email = ["email-validator (>=1.0.3)"]
 
 [[package]]
 name = "pydocstyle"
-version = "6.2.2"
+version = "6.2.3"
 description = "Python docstring style checker"
 category = "dev"
 optional = false
@@ -697,7 +698,7 @@ plugins = ["importlib-metadata"]
 
 [[package]]
 name = "pylint"
-version = "2.15.9"
+version = "2.15.10"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -1261,8 +1262,8 @@ anyio = [
     {file = "anyio-3.6.2.tar.gz", hash = "sha256:25ea0d673ae30af41a0c442f81cf3b38c7e79fdc7b60335a4c14e05eb0947421"},
 ]
 astroid = [
-    {file = "astroid-2.13.0-py3-none-any.whl", hash = "sha256:0ab8b1655f63d657b83ba3c914e5ac6ed2c04033e626bc831d6e41df37f5d3c4"},
-    {file = "astroid-2.13.0.tar.gz", hash = "sha256:a6e7508cdda7d3427b6612d85cb29e1a106043862d9c2a4d94c31456eeebc508"},
+    {file = "astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
+    {file = "astroid-2.13.2.tar.gz", hash = "sha256:3bc7834720e1a24ca797fd785d77efb14f7a28ee8e635ef040b6e2d80ccb3303"},
 ]
 attrs = [
     {file = "attrs-22.2.0-py3-none-any.whl", hash = "sha256:29e95c7f6778868dbd49170f98f8818f78f3dc5e0e37c0b1f474e3561b240836"},
@@ -1935,8 +1936,8 @@ pydantic = [
     {file = "pydantic-1.10.4.tar.gz", hash = "sha256:b9a3859f24eb4e097502a3be1fb4b2abb79b6103dd9e2e0edb70613a4459a648"},
 ]
 pydocstyle = [
-    {file = "pydocstyle-6.2.2-py3-none-any.whl", hash = "sha256:021b33525927b43b4469c2715694c38082cb98146b52342df652b30806e3cb61"},
-    {file = "pydocstyle-6.2.2.tar.gz", hash = "sha256:5714e3a96f6ece848a1c35f581e89f3164867733609f0dd8a99f7e7c6b526bdd"},
+    {file = "pydocstyle-6.2.3-py3-none-any.whl", hash = "sha256:a04ed1e6fe0be0970eddbb1681a7ab59b11eb92729fdb4b9b24f0eb11a25629e"},
+    {file = "pydocstyle-6.2.3.tar.gz", hash = "sha256:d867acad25e48471f2ad8a40ef9813125e954ad675202245ca836cb6e28b2297"},
 ]
 pyflakes = [
     {file = "pyflakes-2.5.0-py2.py3-none-any.whl", hash = "sha256:4579f67d887f804e67edb544428f264b7b24f435b263c4614f384135cea553d2"},
@@ -1947,8 +1948,8 @@ pygments = [
     {file = "Pygments-2.14.0.tar.gz", hash = "sha256:b3ed06a9e8ac9a9aae5a6f5dbe78a8a58655d17b43b93c078f094ddc476ae297"},
 ]
 pylint = [
-    {file = "pylint-2.15.9-py3-none-any.whl", hash = "sha256:349c8cd36aede4d50a0754a8c0218b43323d13d5d88f4b2952ddfe3e169681eb"},
-    {file = "pylint-2.15.9.tar.gz", hash = "sha256:18783cca3cfee5b83c6c5d10b3cdb66c6594520ffae61890858fe8d932e1c6b4"},
+    {file = "pylint-2.15.10-py3-none-any.whl", hash = "sha256:9df0d07e8948a1c3ffa3b6e2d7e6e63d9fb457c5da5b961ed63106594780cc7e"},
+    {file = "pylint-2.15.10.tar.gz", hash = "sha256:b3dc5ef7d33858f297ac0d06cc73862f01e4f2e74025ec3eff347ce0bc60baf5"},
 ]
 pyparsing = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},
