@@ -67,3 +67,25 @@ async def delete(id: str) -> None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found"
         ) from exc
+
+
+@router.put("/{id}/fetch", response_model=VideoRead)
+async def fetch_video(id: str) -> Video:
+    """
+    Fetches new data from yt-dlp and updates a video on the server.
+
+    Args:
+        video_id: The ID of the video to update.
+
+    Returns:
+        The updated video.
+
+    Raises:
+        HTTPException: If the video was not found.
+    """
+    try:
+        return await video_crud.fetch_video(video_id=id)
+    except RecordNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found"
+        ) from exc
