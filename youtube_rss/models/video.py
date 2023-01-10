@@ -41,7 +41,7 @@ class Video(VideoBase, table=True):
         handler = get_handler_from_url(url=values["url"])
         sanitized_url = handler.sanitize_video_url(url=values["url"])
         video_id = generate_uuid_from_url(url=sanitized_url)
-        feed_media_url = f"{BASE_URL}/media/{video_id}"
+        feed_media_url = f"/media/{video_id}"
         return {
             **values,
             "handler": handler.name,

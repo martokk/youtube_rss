@@ -93,3 +93,11 @@ async def fetch_source(source_id: str) -> Source:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Source Not Found"
         ) from exc
+
+
+@router.put("/fetch", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
+async def fetch_all() -> list[ModelClass] | None:
+    """
+    Fetch all sources.
+    """
+    return await source_crud.fetch_all_sources()

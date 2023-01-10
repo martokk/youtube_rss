@@ -300,7 +300,7 @@ class CustomRumbleChannelIE(RumbleChannelIE):
         kwargs = {
             "url": url,
             "thumbnail": thumbnail,
-            "description": None,
+            "description": f"{channel}'s Rumble Channel",
             "title": channel,
             "channel": channel,
             "channel_id": channel_id,

@@ -48,7 +48,7 @@ class Source(SourceBase, table=True):
         handler = get_handler_from_url(url=values["url"])
         sanitized_url = handler.sanitize_source_url(url=values["url"])
         source_id = generate_uuid_from_url(url=sanitized_url)
-        feed_url = f"{BASE_URL}/feed/{source_id}"
+        feed_url = f"/feed/{source_id}"
         return {
             **values,
             "handler": handler.name,

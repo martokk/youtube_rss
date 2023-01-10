@@ -89,3 +89,11 @@ async def fetch_video(id: str) -> Video:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found"
         ) from exc
+
+
+@router.put("/fetch", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
+async def fetch_all() -> list[ModelClass] | None:
+    """
+    Fetch all Videos.
+    """
+    return await video_crud.fetch_all_videos()

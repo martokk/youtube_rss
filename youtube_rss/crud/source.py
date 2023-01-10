@@ -73,10 +73,11 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
             url=db_source.url,
             extract_flat=True,
         )
+        source = await get_source_from_source_info_dict(source_info_dict=source_info_dict)
+        db_source = await self.update(in_obj=SourceCreate(**source.dict()), id=source_id)
 
         # Update Source Videos from Fetched Videos
-        db_source = await self.get(id=source_id)
-        # fetched_videos = fetched_source.videos
+        # db_source = await self.get(id=source_id)
         fetched_videos = await get_source_videos_from_source_info_dict(
             source_info_dict=source_info_dict
         )
@@ -101,6 +102,21 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
         )
 
         return await self.get(id=source_id)
+
+    async def fetch_all_sources(self) -> list[Source]:
+        """
+        Fetch all sources.
+
+        Returns:
+            List[Source]: List of fetched sources
+        """
+        logger.warning("Fetching ALL Sources...")
+        sources = await self.get_all() or []
+        fetched = []
+        for source in sources:
+            fetched.append(await self.fetch_source(source_id=source.id))
+
+        return fetched
 
     async def fetch_source_videos(self, source_id: str) -> Source:
         """Fetch new data from yt-dlp for each video in the source.

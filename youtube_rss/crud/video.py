@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from loguru import logger
 from sqlmodel import Session
 
 from youtube_rss.config import MAX_VIDEO_AGE_HOURS
@@ -66,6 +67,21 @@ class VideoCRUD(BaseCRUD[Video, VideoCreate, VideoRead]):
 
         # Update the video in the database and return it
         return await self.update(VideoCreate(**video.dict()), id=video.id)
+
+    async def fetch_all_videos(self) -> list[Video]:
+        """
+        Fetch videos from all sources.
+
+        Returns:
+            List[Video]: List of fetched videos
+        """
+        logger.warning("Fetching ALL Videos...")
+        videos = await self.get_all() or []
+        fetched = []
+        for video in videos:
+            fetched.append(await self.fetch_video(video_id=video.id))
+
+        return fetched
 
 
 with Session(engine) as _session:
