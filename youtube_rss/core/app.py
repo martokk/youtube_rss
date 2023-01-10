@@ -68,7 +68,7 @@ async def root() -> HTMLResponse:
     """
     sources = await source_crud.get_all() or []
     sources_html = "".join(
-        f'<li><a href="{source.feed_url}">{source.name}</a>  |  <a href="{source.url}">{source.url}</a></li>'
+        f'<li><a href="pktcsts://web?url={source.feed_url}">{source.name}</a>  |  <a href="{source.url}">{source.url}</a></li>'
         for source in sources
     )
     html = f"<html><header><title>RSS Feeds</title></header><body><h2>RSS Feeds</h2><ul>{sources_html}</ul></body></html>"

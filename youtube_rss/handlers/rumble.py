@@ -5,7 +5,11 @@ import datetime
 from dateutil import tz
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
-from youtube_rss.handlers.extractors.rumble import CustomRumbleChannelIE, CustomRumbleEmbedIE
+from youtube_rss.handlers.extractors.rumble import (
+    CustomRumbleChannelIE,
+    CustomRumbleEmbedIE,
+    CustomRumbleIE,
+)
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE
 
 from .base import ServiceHandler
@@ -17,8 +21,8 @@ class RumbleHandler(ServiceHandler):
     USE_PROXY = False
     MEDIA_URL_REFRESH_INTERVAL = 60 * 60 * 8  # 8 Hours
     DOMAINS = ["rumble.com"]
-    YTDLP_CUSTOM_EXTRACTORS = [CustomRumbleChannelIE, CustomRumbleEmbedIE]
-    YDL_OPT_ALLOWED_EXTRACTORS = ["CustomRumbleEmbed", "CustomRumbleChannel"]
+    YTDLP_CUSTOM_EXTRACTORS = [CustomRumbleIE, CustomRumbleChannelIE, CustomRumbleEmbedIE]
+    YDL_OPT_ALLOWED_EXTRACTORS = ["CustomRumbleIE", "CustomRumbleEmbed", "CustomRumbleChannel"]
 
     # def sanitize_video_url(self, url: str) -> str:
     #     """
@@ -78,6 +82,18 @@ class RumbleHandler(ServiceHandler):
             "allowed_extractors": self.YDL_OPT_ALLOWED_EXTRACTORS,
         }
 
+    def get_video_ydl_opts(self) -> dict[str, Any]:
+        """
+        Get the yt-dlp options for a video.
+
+        Returns:
+            dict: The yt-dlp options for the source.
+        """
+        return {
+            **YDL_OPTS_BASE,
+            "allowed_extractors": self.YDL_OPT_ALLOWED_EXTRACTORS,
+        }
+
     def map_source_info_dict_to_source_dict(
         self, source_info_dict: dict[str, Any], source_videos: list[Any]
     ) -> dict[str, Any]:
@@ -97,7 +113,7 @@ class RumbleHandler(ServiceHandler):
             "author": source_info_dict["uploader"],
             "logo": source_info_dict["thumbnail"],
             "ordered_by": "release",
-            "description": f"{source_info_dict['uploader']}'s Rumble Channel",
+            "description": f"{source_info_dict.get('description', source_info_dict['uploader'])}",
             "videos": source_videos,
             "extractor": source_info_dict["extractor_key"],
         }
@@ -153,7 +169,7 @@ class RumbleHandler(ServiceHandler):
         return {
             "title": entry_info_dict["title"],
             "uploader": entry_info_dict["uploader"],
-            "uploader_id": entry_info_dict["uploader"],
+            "uploader_id": entry_info_dict["channel"],
             "description": entry_info_dict.get(
                 "description", f"Rumble video uploaded by {entry_info_dict['uploader']}"
             ),

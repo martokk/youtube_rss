@@ -2,10 +2,15 @@
 import re
 
 from yt_dlp.compat import compat_HTTPError
+from yt_dlp.extractor.common import InfoExtractor
 from yt_dlp.extractor.rumble import RumbleChannelIE, RumbleEmbedIE
 from yt_dlp.utils import (
     ExtractorError,
+    UnsupportedError,
+    clean_html,
+    get_element_by_class,
     int_or_none,
+    parse_count,
     parse_duration,
     parse_iso8601,
     traverse_obj,
@@ -13,7 +18,124 @@ from yt_dlp.utils import (
 )
 
 
+class CustomRumbleIE(InfoExtractor):
+    _VALID_URL = r"https?://(?:www\.)?rumble\.com/(?P<id>v(?!ideos)[\w.-]+)[^/]*$"
+    _EMBED_REGEX = [r"<a class=video-item--a href=(?P<url>/v[\w.-]+\.html)>"]
+    _TESTS = [
+        {
+            "add_ie": ["CustomRumbleEmbed"],
+            "url": "https://rumble.com/vdmum1-moose-the-dog-helps-girls-dig-a-snow-fort.html",
+            "md5": "53af34098a7f92c4e51cf0bd1c33f009",
+            "info_dict": {
+                "id": "vb0ofn",
+                "ext": "mp4",
+                "timestamp": 1612662578,
+                "uploader": "LovingMontana",
+                "channel": "LovingMontana",
+                "upload_date": "20210207",
+                "title": "Winter-loving dog helps girls dig a snow fort ",
+                "description": "Moose the dog is more than happy to help with digging out this epic snow fort. Great job, Moose!",
+                "channel_url": "https://rumble.com/c/c-546523",
+                "thumbnail": r"re:https://.+\.jpg",
+                "duration": 103,
+                "like_count": int,
+                "view_count": int,
+                "live_status": "not_live",
+            },
+        },
+        {
+            "url": "http://www.rumble.com/vDMUM1?key=value",
+            "only_matching": True,
+        },
+    ]
+
+    _WEBPAGE_TESTS = [
+        {
+            "url": "https://rumble.com/videos?page=2",
+            "playlist_count": 25,
+            "info_dict": {
+                "id": "videos?page=2",
+                "title": "All videos",
+                "description": "Browse videos uploaded to Rumble.com",
+                "age_limit": 0,
+            },
+        },
+        {
+            "url": "https://rumble.com/live-videos",
+            "playlist_mincount": 19,
+            "info_dict": {
+                "id": "live-videos",
+                "title": "Live Videos",
+                "description": "Live videos on Rumble.com",
+                "age_limit": 0,
+            },
+        },
+        {
+            "url": "https://rumble.com/search/video?q=rumble&sort=views",
+            "playlist_count": 24,
+            "info_dict": {
+                "id": "video?q=rumble&sort=views",
+                "title": "Search results for: rumble",
+                "age_limit": 0,
+            },
+        },
+    ]
+
+    def _real_extract(self, url):
+        page_id = self._match_id(url)
+        webpage = self._download_webpage(url, page_id)
+        url_info = next(
+            CustomRumbleEmbedIE.extract_from_webpage(self._downloader, url, webpage), None
+        )
+        if not url_info:
+            raise UnsupportedError(url)
+
+        release_ts_str = self._search_regex(
+            r'(?:Livestream begins|Streamed on):\s+<time datetime="([^"]+)',
+            webpage,
+            "release date",
+            fatal=False,
+            default=None,
+        )
+        view_count_str = self._search_regex(
+            r'<span class="media-heading-info">([\d,]+) Views',
+            webpage,
+            "view count",
+            fatal=False,
+            default=None,
+        )
+
+        return self.url_result(
+            url_info["url"],
+            ie_key=url_info["ie_key"],
+            url_transparent=True,
+            view_count=parse_count(view_count_str),
+            release_timestamp=parse_iso8601(release_ts_str),
+            like_count=parse_count(get_element_by_class("rumbles-count", webpage)),
+            description=clean_html(get_element_by_class("media-description", webpage)),
+        )
+
+
 class CustomRumbleEmbedIE(RumbleEmbedIE):
+    _VALID_URL = r"https?:\/\/(?:www\.)?rumble\.com\/embed\/(?:[0-9a-z]+\.)?(?P<id>[0-9a-z]+)"
+    # _VALID_URL = r"https?:\/\/(?:www\.)?rumble\.com\/(?:embed\/)?(?P<id>[0-9a-z]+)(?:-[^\/]*)?"
+    _EMBED_REGEX = [
+        rf'(?:<(?:script|iframe)[^>]+\bsrc=|["\']embedUrl["\']\s*:\s*)["\'](?P<url>{_VALID_URL})'
+    ]
+
+    @classmethod
+    def _extract_embed_urls(cls, url, webpage):
+        embeds = tuple(super()._extract_embed_urls(url, webpage))
+        if embeds:
+            return embeds
+        return [
+            f'https://rumble.com/embed/{mobj.group("id")}'
+            for mobj in re.finditer(
+                r'<script>\s*Rumble\(\s*"play"\s*,\s*{\s*[\'"]video[\'"]\s*:\s*[\'"](?P<id>[0-9a-z]+)[\'"]',
+                webpage,
+            )
+        ]
+
     def _real_extract(self, url):
         video_id = self._match_id(url)
         video = self._download_json(
@@ -97,25 +219,6 @@ class CustomRumbleEmbedIE(RumbleEmbedIE):
         else:
             duration = int_or_none(video.get("duration"))
 
-        # Custom Additions``
-        # embed_page = self._download_webpage(url, video_id, note="Downloading embed page")
-        # canonical_url = self._search_regex(
-        #     r'<link\s+rel="canonical"\s*href="(.+?)"', embed_page, "canonical URL", default=url
-        # )
-        # webpage = self._download_webpage(canonical_url, video_id)
-        # description = self._html_search_regex(
-        #     r'media-description">([^<]+)<', webpage, "description", default=None, fatal=False
-        # )
-        # view_count = self._html_search_regex(
-        #     r'media-heading-info">([0-9,]+) Views<',
-        #     webpage,
-        #     "view_count",
-        #     default=None,
-        #     fatal=False,
-        # )
-        # if view_count:
-        #     view_count = int_or_none(view_count.replace(",", ""))
-
         return {
             "id": video_id,
             "title": unescapeHTML(video.get("title")),
@@ -128,8 +231,6 @@ class CustomRumbleEmbedIE(RumbleEmbedIE):
             "duration": duration,
             "uploader": author.get("name"),
             "live_status": live_status,
-            # "description": description,
-            # "view_count": view_count,
         }
 
 
@@ -143,25 +244,35 @@ class CustomRumbleChannelIE(RumbleChannelIE):
             if isinstance(e.cause, compat_HTTPError) and e.cause.code == 404:
                 return
             raise
-        # for video_url in re.findall(r"class=video-item--a\s?href=([^>]+\.html)", webpage):
-        #     yield self._build_entry(video_url)
+
         for container in re.findall(
             r'<li class="video-listing-entry">(.+?)</li>', webpage, flags=re.DOTALL
         ):
+            # Handle if video is a LIVE video.
+            live_match = re.search(r'class=video-item--live data-value="([^"]+)', container)
+            if live_match:
+                if live_match.group(1) == "LIVE":
+                    continue
+
+            # Build Entry
             yield self._build_entry(container=container, **kwargs)
 
     def _build_entry(self, container, **kwargs):
+        # Scrape Remaining Data
         video_id = re.search(r"\/(v[^-]*)-", container).group(1)
         video_url = re.search(r"class=video-item--a\s?href=([^>]+\.html)", container).group(1)
-
         # title = re.search(r'title="([^\"]+)"', container).group(1)
         title = re.search(r"class=video-item--title>([^\<]+)<\/h3>", container).group(1)
         # description = re.search(r'<p class="description"\s*>(.+?)</p>', container).group(1)
         timestamp = parse_iso8601(re.search(r'datetime=([^">]+)>', container).group(1))
         thumbnail = re.search(r"src=([^\s>]+)", container).group(1)
-        duration = parse_duration(
-            re.search(r"class=video-item--duration data-value=([^\">]+)>", container).group(1)
-        )
+
+        duration_match = re.search(r"class=video-item--duration data-value=([^\">]+)>", container)
+        if duration_match:
+            duration = parse_duration(duration_match.group(1))
+        else:
+            duration = None
+
         return {
             **kwargs,
             **self.url_result("https://rumble.com" + video_url),
@@ -190,7 +301,7 @@ class CustomRumbleChannelIE(RumbleChannelIE):
             "url": url,
             "thumbnail": thumbnail,
             "description": None,
-            "title": f"{channel}'s Rumble Channel",
+            "title": channel,
             "channel": channel,
             "channel_id": channel_id,
             "channel_url": channel_url,

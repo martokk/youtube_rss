@@ -1,7 +1,6 @@
 from typing import Any
 
 from youtube_rss.handlers import get_handler_from_url
-from youtube_rss.handlers.extractors.rumble import CustomRumbleChannelIE, CustomRumbleEmbedIE
 from youtube_rss.models.source import Source
 from youtube_rss.models.video import Video
 from youtube_rss.services.ytdlp import get_info_dict

@@ -2,17 +2,7 @@ from typing import Any
 
 from youtube_rss.handlers import get_handler_from_url
 from youtube_rss.models.video import Video
-from youtube_rss.services.ytdlp import YDL_OPTS_BASE, get_info_dict
-
-
-async def get_video_ydl_opts() -> dict[str, Any]:
-    """
-    Get the yt-dlp options for a video.
-
-    Returns:
-        dict: The yt-dlp options for the source.
-    """
-    return YDL_OPTS_BASE
+from youtube_rss.services.ytdlp import get_info_dict
 
 
 async def get_video_info_dict(
@@ -40,8 +30,10 @@ async def get_video_info_dict(
     #     return pickle.loads(cache_file.read_bytes())
 
     # Get info_dict from yt-dlp
-    ydl_opts = await get_video_ydl_opts()
-    info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts)
+    handler = get_handler_from_url(url=url)
+    ydl_opts = handler.get_video_ydl_opts()
+    custom_extractors = handler.YTDLP_CUSTOM_EXTRACTORS
+    info_dict = await get_info_dict(url=url, ydl_opts=ydl_opts, custom_extractors=custom_extractors)
 
     # Save Pickle
     # cache_file.parent.mkdir(exist_ok=True, parents=True)
