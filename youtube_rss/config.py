@@ -24,7 +24,7 @@ PROXY_HOST = str(os.environ.get("PROXY_HOST", "localhost"))
 DATABASE_ECHO = os.environ.get("DATABASE_ECHO", "True") == "True"
 
 # Log
-LOG_LEVEL = str(os.environ.get("LOG_LEVEL", "INFO"))
+LOG_LEVEL = str(os.environ.get("LOG_LEVEL", "INFO")).upper()
 
 # Build Feed
 BUILD_FEED_RECENT_VIDEOS = int(os.environ.get("BUILD_FEED_RECENT_VIDEOS", 20))
