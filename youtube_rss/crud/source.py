@@ -97,9 +97,14 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
         added_videos = await add_new_source_videos_from_fetched_videos(
             fetched_videos=fetched_videos, db_source=db_source
         )
-        deleted_videos = await delete_orphaned_source_videos(
-            fetched_videos=fetched_videos, db_source=db_source
-        )
+
+        # NOTE: Enable if db grows too large. Otherwise best not to delete any videos
+        # from database as podcast app will still reference the video's feed_media_url
+        # deleted_videos = await delete_orphaned_source_videos(
+        #     fetched_videos=fetched_videos, db_source=db_source
+        # )
+        deleted_videos = []
+
         refreshed_videos = await refresh_videos(videos=db_source.videos)
 
         # Build RSS File
