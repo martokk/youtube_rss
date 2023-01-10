@@ -8,6 +8,7 @@ from youtube_rss.paths import ENV_FILE
 load_dotenv(dotenv_path=ENV_FILE)
 
 # --- Bind Environment variables
+LOG_LEVEL = str(os.environ.get("LOG_LEVEL", "INFO"))
 
 # Server
 SERVER_IP = str(os.environ.get("SERVER_IP", "0.0.0.0"))

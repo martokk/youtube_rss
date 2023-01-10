@@ -8,6 +8,7 @@ from youtube_rss.api.v1.api import api_router
 from youtube_rss.config import (
     BASE_DOMAIN,
     BASE_URL,
+    LOG_LEVEL,
     REFRESH_SOURCES_INTERVAL_MINUTES,
     REFRESH_VIDEOS_INTERVAL_MINUTES,
 )
@@ -17,7 +18,7 @@ from youtube_rss.db.database import create_db_and_tables
 from youtube_rss.paths import FEEDS_PATH, LOG_FILE
 
 # Configure Loguru Logger
-logger.add(LOG_FILE, level="TRACE", rotation="50 MB")
+logger.add(LOG_FILE, level=LOG_LEVEL, rotation="50 MB")
 
 # Initialize FastAPI App
 
