@@ -1,11 +1,13 @@
+from typing import Any
+
 from loguru import logger
-from telegram import Bot, Message
+from telegram import Bot
 from telegram.error import BadRequest
 
 from youtube_rss.config import TELEGRAM_API_TOKEN, TELEGRAM_CHAT_ID
 
 
-async def notify(text: str) -> Message | None:
+async def notify(text: str) -> Any:
     """Sends a message via Telegram using the given text as the message's content.
     Telegram API token and chat ID must be set before calling this function.
 
@@ -13,7 +15,10 @@ async def notify(text: str) -> Message | None:
         text (str): The message text to send.
 
     Returns:
-        Message : the message object
+        Any : the message object
+
+    Raises:
+        ValueError: If the chat with the Telegram bot has not been initialized by the user
     """
     if not TELEGRAM_API_TOKEN or TELEGRAM_CHAT_ID == 0:
         logger.warning("TELEGRAM_API_TOKEN or TELEGRAM_CHAT_ID config variables are not set.")
