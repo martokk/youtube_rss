@@ -50,6 +50,7 @@ httpx = "^0.23.1"
 shortuuid = "^1.0.11"
 sqlmodel = "^0.0.8"
 wheel = "^0.38.1"
+python-telegram-bot = "^20.0"
 
 
 [tool.poetry.group.dev.dependencies]

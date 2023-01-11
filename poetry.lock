@@ -812,6 +812,27 @@ python-versions = ">=3.7"
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-telegram-bot"
+version = "20.0"
+description = "We have made you a wrapper you can't refuse"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+httpx = ">=0.23.1,<0.24.0"
+
+[package.extras]
+all = ["APScheduler (>=3.9.1,<3.10.0)", "aiolimiter (>=1.0.0,<1.1.0)", "cachetools (>=5.2.0,<5.3.0)", "cryptography (>=3.0,!=3.4,!=3.4.1,!=3.4.2,!=3.4.3)", "httpx[socks]", "pytz (>=2018.6)", "tornado (>=6.2,<7.0)"]
+callback-data = ["cachetools (>=5.2.0,<5.3.0)"]
+ext = ["APScheduler (>=3.9.1,<3.10.0)", "aiolimiter (>=1.0.0,<1.1.0)", "cachetools (>=5.2.0,<5.3.0)", "pytz (>=2018.6)", "tornado (>=6.2,<7.0)"]
+job-queue = ["APScheduler (>=3.9.1,<3.10.0)", "pytz (>=2018.6)"]
+passport = ["cryptography (>=3.0,!=3.4,!=3.4.1,!=3.4.2,!=3.4.3)"]
+rate-limiter = ["aiolimiter (>=1.0.0,<1.1.0)"]
+socks = ["httpx[socks]"]
+webhooks = ["tornado (>=6.2,<7.0)"]
+
+[[package]]
 name = "pyupgrade"
 version = "3.3.1"
 description = "A tool to automatically upgrade syntax for newer versions."
@@ -1224,7 +1245,7 @@ websockets = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "16ce6d5317715482da283eba9fadde3562af63347e51dfea67212cd26b1e2800"
+content-hash = "ba46ca58f09f0e582e8dedd803bdd06b82b1d611ecf83e68ebb086739d4b4f26"
 
 [metadata.files]
 anyio = [
@@ -1948,6 +1969,10 @@ python-dateutil = [
 python-dotenv = [
     {file = "python-dotenv-0.21.0.tar.gz", hash = "sha256:b77d08274639e3d34145dfa6c7008e66df0f04b7be7a75fd0d5292c191d79045"},
     {file = "python_dotenv-0.21.0-py3-none-any.whl", hash = "sha256:1684eb44636dd462b66c3ee016599815514527ad99965de77f43e0944634a7e5"},
+]
+python-telegram-bot = [
+    {file = "python-telegram-bot-20.0.tar.gz", hash = "sha256:9ff3d7b03d0e621df6c903622338e30d761e121c27179e13f62ba2216b7c6d32"},
+    {file = "python_telegram_bot-20.0-py3-none-any.whl", hash = "sha256:2f7f0a0eee6517ffb3e9732b622b5c97c107517f35dc2a97273c74cb5ed39e9d"},
 ]
 pyupgrade = [
     {file = "pyupgrade-3.3.1-py2.py3-none-any.whl", hash = "sha256:3b93641963df022d605c78aeae4b5956a5296ea24701eafaef9c487527b77e60"},

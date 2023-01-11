@@ -8,6 +8,7 @@ from youtube_rss.paths import ENV_FILE
 load_dotenv(dotenv_path=ENV_FILE)
 
 # --- Bind Environment variables
+ENV_NAME = str(os.environ.get("ENV_NAME", "Unspecified ENV_NAME"))
 
 # Server
 SERVER_IP = str(os.environ.get("SERVER_IP", "0.0.0.0"))
@@ -25,6 +26,10 @@ DATABASE_ECHO = os.environ.get("DATABASE_ECHO", "True") == "True"
 
 # Log
 LOG_LEVEL = str(os.environ.get("LOG_LEVEL", "INFO")).upper()
+
+# Notify
+TELEGRAM_API_TOKEN = str(os.environ.get("TELEGRAM_API_TOKEN"))
+TELEGRAM_CHAT_ID = int(os.environ.get("TELEGRAM_CHAT_ID", 0))
 
 # Build Feed
 BUILD_FEED_RECENT_VIDEOS = int(os.environ.get("BUILD_FEED_RECENT_VIDEOS", 20))
