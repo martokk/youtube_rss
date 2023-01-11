@@ -11,7 +11,7 @@ from youtube_rss.config import (
     REFRESH_SOURCES_INTERVAL_MINUTES,
     REFRESH_VIDEOS_INTERVAL_MINUTES,
 )
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 from youtube_rss.core.notify import notify
 from youtube_rss.crud.source import refresh_all_sources, source_crud
 from youtube_rss.crud.video import refresh_all_videos

@@ -3,7 +3,7 @@ from typing import Any, overload
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import Session
 
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError
 from youtube_rss.crud.video import VideoCRUD, refresh_videos
 from youtube_rss.db.database import engine

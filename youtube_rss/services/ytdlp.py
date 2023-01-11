@@ -3,7 +3,7 @@ from typing import Any, Type
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor.common import InfoExtractor
 
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 
 YDL_OPTS_BASE: dict[str, Any] = {
     "logger": logger,

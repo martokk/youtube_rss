@@ -3,7 +3,7 @@ from rich.console import Console
 
 from youtube_rss import version
 from youtube_rss.constants import PACKAGE_DESCRIPTION, PACKAGE_NAME
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 from youtube_rss.core.server import start_server
 
 # Configure Rich Console

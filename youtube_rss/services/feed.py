@@ -4,7 +4,7 @@ from pathlib import Path
 from feedgen.feed import FeedGenerator
 
 from youtube_rss.config import BASE_URL
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 from youtube_rss.models.source import Source
 from youtube_rss.paths import FEEDS_PATH
 

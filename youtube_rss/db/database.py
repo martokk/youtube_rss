@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, create_engine
 
 from youtube_rss.config import DATABASE_ECHO
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 from youtube_rss.paths import DATABASE_FILE
 
 database_url = f"sqlite:///{DATABASE_FILE}"

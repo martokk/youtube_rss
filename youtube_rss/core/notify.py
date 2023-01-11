@@ -4,7 +4,7 @@ from telegram import Bot
 from telegram.error import BadRequest
 
 from youtube_rss.config import TELEGRAM_API_TOKEN, TELEGRAM_CHAT_ID
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 
 
 async def notify(text: str) -> Any:

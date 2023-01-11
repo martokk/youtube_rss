@@ -3,7 +3,7 @@ from typing import Any, Callable
 import functools
 import time
 
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 
 
 def log_function_enter_exit(  # type: ignore

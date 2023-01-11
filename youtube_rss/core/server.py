@@ -1,7 +1,7 @@
 import uvicorn
 
 from youtube_rss.config import LOG_LEVEL, SERVER_IP, SERVER_PORT, UVICORN_ENTRYPOINT, UVICORN_RELOAD
-from youtube_rss.core.log import logger
+from youtube_rss.core.logger import logger
 
 # from rich.logging import RichHandler
 
