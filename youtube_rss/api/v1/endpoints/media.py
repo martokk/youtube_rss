@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, Response
-from loguru import logger
 
+from youtube_rss.core.log import logger
 from youtube_rss.core.proxy import reverse_proxy
 from youtube_rss.crud.exceptions import RecordNotFoundError
 from youtube_rss.crud.video import video_crud

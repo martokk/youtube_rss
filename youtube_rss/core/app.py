@@ -2,28 +2,23 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
-from loguru import logger
 
 from youtube_rss.api.v1.api import api_router
 from youtube_rss.config import (
     BASE_DOMAIN,
     BASE_URL,
     ENV_NAME,
-    LOG_LEVEL,
     REFRESH_SOURCES_INTERVAL_MINUTES,
     REFRESH_VIDEOS_INTERVAL_MINUTES,
 )
+from youtube_rss.core.log import logger
 from youtube_rss.core.notify import notify
 from youtube_rss.crud.source import refresh_all_sources, source_crud
 from youtube_rss.crud.video import refresh_all_videos
 from youtube_rss.db.database import create_db_and_tables
-from youtube_rss.paths import FEEDS_PATH, LOG_FILE
-
-# Configure Loguru Logger
-logger.add(LOG_FILE, level=LOG_LEVEL, rotation="50 MB")
+from youtube_rss.paths import FEEDS_PATH
 
 # Initialize FastAPI App
-
 app = FastAPI()
 app.debug = True
 app.include_router(api_router)

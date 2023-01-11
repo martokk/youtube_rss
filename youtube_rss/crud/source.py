@@ -1,10 +1,9 @@
-from typing import Any
+from typing import Any, overload
 
-from loguru import logger
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import Session
 
-from youtube_rss.core.debug_helpers import timeit
+from youtube_rss.core.log import logger
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError
 from youtube_rss.crud.video import VideoCRUD, refresh_videos
 from youtube_rss.db.database import engine

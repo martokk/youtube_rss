@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from loguru import logger
 from sqlmodel import Session
 
 from youtube_rss.config import MAX_VIDEO_AGE_HOURS
 from youtube_rss.core.debug_helpers import timeit
+from youtube_rss.core.log import logger
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError
 from youtube_rss.db.database import engine
 from youtube_rss.models.video import Video, VideoCreate, VideoRead, generate_video_id_from_url

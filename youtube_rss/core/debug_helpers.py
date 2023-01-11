@@ -3,18 +3,17 @@ from typing import Any, Callable
 import functools
 import time
 
-from loguru import logger
+from youtube_rss.core.log import logger
 
 
 def log_function_enter_exit(  # type: ignore
-    *, entry=True, exit=True, level="DEBUG"
+    *, entry=True, exit=True
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator for logging function calls.
 
     Args:
         entry: Log the function call.
         exit: Log the function return.
-        level: Log level.
 
     Returns:
         The decorated function.

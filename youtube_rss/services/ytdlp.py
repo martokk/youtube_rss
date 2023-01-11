@@ -1,21 +1,16 @@
 from typing import Any, Type
 
-from loguru import logger
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor.common import InfoExtractor
 
-from youtube_rss.config import LOG_LEVEL
-from youtube_rss.paths import LOG_FILE
-
-# Configure Loguru Logger
-logger.add(LOG_FILE, level=LOG_LEVEL, rotation="50 MB")
+from youtube_rss.core.log import logger
 
 YDL_OPTS_BASE: dict[str, Any] = {
     "logger": logger,
     "format": "worst[ext=mp4]",
     "skip_download": True,
     "simulate": True,
-    "verbose": True,
+    # "verbose": True,
 }
 
 

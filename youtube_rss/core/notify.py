@@ -1,10 +1,10 @@
 from typing import Any
 
-from loguru import logger
 from telegram import Bot
 from telegram.error import BadRequest
 
 from youtube_rss.config import TELEGRAM_API_TOKEN, TELEGRAM_CHAT_ID
+from youtube_rss.core.log import logger
 
 
 async def notify(text: str) -> Any:
