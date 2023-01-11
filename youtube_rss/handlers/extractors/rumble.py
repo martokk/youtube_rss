@@ -259,23 +259,30 @@ class CustomRumbleChannelIE(RumbleChannelIE):
 
     def _build_entry(self, container, **kwargs):
         # Scrape Remaining Data
-        video_id = re.search(r"\/(v[^-]*)-", container).group(1)
-        video_url = re.search(r"class=video-item--a\s?href=([^>]+\.html)", container).group(1)
-        # title = re.search(r'title="([^\"]+)"', container).group(1)
-        title = re.search(r"class=video-item--title>([^\<]+)<\/h3>", container).group(1)
+        video_id_match = re.search(r"\/(v[^-]*)-", container)
+        video_id = video_id_match.group(1) if video_id_match else None
+
+        video_url_match = re.search(r"class=video-item--a\s?href=([^>]+\.html)", container)
+        video_url = video_url_match.group(1) if video_url_match else None
+
+        # title = re.search(r'title="([^\"]+)"', container).group(1)'
+        title_match = re.search(r"class=video-item--title>([^\<]+)<\/h3>", container)
+        title = title_match.group(1) if title_match else None
+
         # description = re.search(r'<p class="description"\s*>(.+?)</p>', container).group(1)
-        timestamp = parse_iso8601(re.search(r'datetime=([^">]+)>', container).group(1))
-        thumbnail = re.search(r"src=([^\s>]+)", container).group(1)
+
+        timestamp_match = re.search(r'datetime=([^">]+)>', container)
+        timestamp = parse_iso8601(timestamp_match.group(1)) if timestamp_match else None
+
+        thumbnail_match = re.search(r"src=([^\s>]+)", container)
+        thumbnail = thumbnail_match.group(1) if thumbnail_match else None
 
         duration_match = re.search(r"class=video-item--duration data-value=([^\">]+)>", container)
-        if duration_match:
-            duration = parse_duration(duration_match.group(1))
-        else:
-            duration = None
+        duration = parse_duration(duration_match.group(1)) if duration_match else None
 
         return {
             **kwargs,
-            **self.url_result("https://rumble.com" + video_url),
+            **self.url_result(f"https://rumble.com{video_url}"),
             "id": video_id,
             "display_id": video_id,
             "title": title,
@@ -290,10 +297,17 @@ class CustomRumbleChannelIE(RumbleChannelIE):
         webpage = self._download_webpage(
             f"{url}?page=1", note="Downloading webpage", video_id=playlist_id
         )
-        thumbnail = re.search(r"class=listing-header--thumb src=([^\s>]+)", webpage).group(1)
-        channel = re.search(r"class=ellipsis-1>([^\">]+)<", webpage).group(1)
-        channel_id = re.search(r"href=\/c\/([^\">]+)", webpage).group(1)
-        channel_url = "https://rumble.com/c/" + channel_id
+
+        thumbnail_match = re.search(r"class=listing-header--thumb src=([^\s>]+)", webpage)
+        thumbnail = thumbnail_match.group(1) if thumbnail_match else None
+
+        channel_match = re.search(r"class=ellipsis-1>([^\">]+)<", webpage)
+        channel = channel_match.group(1) if channel_match else None
+
+        channel_id_match = re.search(r"href=\/c\/([^\">]+)", webpage)
+        channel_id = channel_id_match.group(1) if channel_id_match else None
+
+        channel_url = f"https://rumble.com/c/{channel_id}"
         uploader = channel
         uploader_id = channel_id
         uploader_url = channel_url

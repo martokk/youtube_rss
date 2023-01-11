@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Any, Type
 
 from abc import abstractmethod
 from urllib.parse import urlparse
+
+from yt_dlp.extractor.common import InfoExtractor
 
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE
 
@@ -9,9 +11,9 @@ from youtube_rss.services.ytdlp import YDL_OPTS_BASE
 class ServiceHandler:
     USE_PROXY = False
     MEDIA_URL_EXPIRY_INTERVAL = 60 * 60 * 24 * 365  # 1 Year
-    DOMAINS = []
-    YTDLP_CUSTOM_EXTRACTORS = []
-    YDL_OPT_ALLOWED_EXTRACTORS = []
+    DOMAINS: list[str] = []
+    YTDLP_CUSTOM_EXTRACTORS: list[Type[InfoExtractor]] = []
+    YDL_OPT_ALLOWED_EXTRACTORS: list[str] = []
 
     @property
     def name(self) -> str:

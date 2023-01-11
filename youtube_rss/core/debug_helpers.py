@@ -6,7 +6,7 @@ import time
 from loguru import logger
 
 
-def log_function_enter_exit(
+def log_function_enter_exit(  # type: ignore
     *, entry=True, exit=True, level="DEBUG"
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator for logging function calls.
@@ -25,12 +25,11 @@ def log_function_enter_exit(
 
         @functools.wraps(func)
         def wrapped(*args: Any, **kwargs: Any) -> Any:
-            logger_ = logger.opt(depth=1)
             if entry:
-                logger_.log(level, "Entering '{}' (args={}, kwargs={})", name, args, kwargs)
-            result = func(*args, **kwargs)
+                logger.debug(f"Entering '{name}' (args={args}, kwargs={kwargs})")
+            result: Any = func(*args, **kwargs)
             if exit:
-                logger_.log(level, "Exiting '{}' (result={})", name, result)
+                logger.debug(f"Exiting '{name}' (result={result}, name={name})")
             return result
 
         return wrapped
@@ -38,6 +37,7 @@ def log_function_enter_exit(
     return wrapper
 
 
+# type: ignore
 def timeit(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator for logging the execution time of a function.
 

@@ -103,7 +103,7 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
         # deleted_videos = await delete_orphaned_source_videos(
         #     fetched_videos=fetched_videos, db_source=db_source
         # )
-        deleted_videos = []
+        deleted_videos: list[Video] = []
 
         refreshed_videos = await refresh_videos(videos=db_source.videos)
 
@@ -167,11 +167,10 @@ async def refresh_all_sources() -> list[Source]:
     Returns:
         The list of refreshed Sources.
     """
-    sources = await source_crud.get_all()
+    sources = await source_crud.get_all() or []
     return await refresh_sources(sources=sources)
 
 
-@timeit
 async def refresh_sources(sources: list[Source]) -> list[Source]:
     """
     Fetches new data from yt-dlp for each Source.

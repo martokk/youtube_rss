@@ -62,12 +62,9 @@ async def repeating_refresh_videos() -> None:
 
 
 @app.get("/")
-async def root() -> HTMLResponse:
+async def read_root() -> HTMLResponse:
     """
     Server root. Returns html response of all sources.
-
-    Parameters:
-        sources: List of sources to display
 
     Returns:
         HTMLResponse: HTML page with list of sources

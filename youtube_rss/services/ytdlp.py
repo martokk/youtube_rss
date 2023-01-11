@@ -27,6 +27,8 @@ async def get_info_dict(
         ydl_opts (dict[str, Any]): The options to use with YouTube-DL.
         ie_key (Optional[str]): The name of the YouTube-DL info extractor to use.
             If not provided, the default extractor will be used.
+        custom_extractors (Optional[list[Type[InfoExtractor]]]): A list of
+            Custom Extractors to make available to yt-dlp.
 
     Returns:
         dict[str, Any]: The info dictionary for the object.
@@ -42,7 +44,7 @@ async def get_info_dict(
                 ydl.add_info_extractor(custom_extractor())
 
         # Get Info Dict
-        info_dict = ydl.extract_info(url, download=False, ie_key=ie_key)
+        info_dict: dict[str, Any] = ydl.extract_info(url, download=False, ie_key=ie_key)
         if info_dict is None:
             raise ValueError(
                 f"yt-dlp did not download a info_dict object. {info_dict=} {url=} {ie_key=} {ydl_opts=}"

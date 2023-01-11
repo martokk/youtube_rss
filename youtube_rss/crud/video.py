@@ -115,7 +115,6 @@ async def fetch_videos(videos: list[Video]) -> list[Video]:
     return [await video_crud.fetch_video(video_id=video.id) for video in videos]
 
 
-@timeit
 async def refresh_videos(
     videos: list[Video], older_than_hours: int = MAX_VIDEO_AGE_HOURS
 ) -> list[Video]:

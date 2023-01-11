@@ -3,11 +3,9 @@ from typing import TYPE_CHECKING, Any
 import datetime
 from enum import Enum
 
-from dateutil import tz
 from pydantic import root_validator
 from sqlmodel import Field, Relationship, SQLModel
 
-from youtube_rss.config import BASE_URL
 from youtube_rss.handlers import get_handler_from_url
 from youtube_rss.services.uuid import generate_uuid_from_url
 
@@ -56,15 +54,15 @@ class Source(SourceBase, table=True):
             "id": source_id,
             "feed_url": feed_url,
             "ordered_by": SourceOrderBy.RELEASE.value,
-            "added_at": values.get("added_at", datetime.datetime.now(tz=tz.tzutc())),
-            "updated_at": datetime.datetime.now(tz=tz.tzutc()),
+            "added_at": values.get("added_at", datetime.datetime.now(tz=datetime.timezone.utc)),
+            "updated_at": datetime.datetime.now(tz=datetime.timezone.utc),
         }
 
 
 class SourceCreate(SourceBase):
     @root_validator
     def create_updated_at(cls, values: dict[str, Any | None]) -> dict[str, Any]:
-        values["updated_at"] = datetime.datetime.now(tz=tz.tzutc())
+        values["updated_at"] = datetime.datetime.now(tz=datetime.timezone.utc)
         return values
 
 

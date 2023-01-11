@@ -75,7 +75,7 @@ async def fetch_video(id: str) -> Video:
     Fetches new data from yt-dlp and updates a video on the server.
 
     Args:
-        video_id: The ID of the video to update.
+        id: The ID of the video to update.
 
     Returns:
         The updated video.

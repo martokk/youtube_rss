@@ -17,10 +17,10 @@ def get_handler_from_url(url: str | ParseResult) -> ServiceHandler:
         return YoutubeHandler()
     if domain_name in RumbleHandler.DOMAINS:
         return RumbleHandler()
-    raise HandlerNotFoundError(f"A handler could not be found for url: {url}.")
+    raise HandlerNotFoundError(f"A handler could not be found: {url=}.")
 
 
 def get_handler_from_string(handler_string: str) -> ServiceHandler:
     if handler_string == "YoutubeHandler":
         return YoutubeHandler()
-    return ServiceHandler()
+    raise HandlerNotFoundError(f"A handler could not be found: {handler_string=}.")

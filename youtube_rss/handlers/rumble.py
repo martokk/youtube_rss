@@ -2,8 +2,6 @@ from typing import Any
 
 import datetime
 
-from dateutil import tz
-
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
 from youtube_rss.handlers.extractors.rumble import (
     CustomRumbleChannelIE,
@@ -137,7 +135,7 @@ class RumbleHandler(ServiceHandler):
         return {
             "source_id": source_id,
             "url": url,
-            "added_at": datetime.datetime.now(tz=tz.tzutc()),
+            "added_at": datetime.datetime.now(tz=datetime.timezone.utc),
             "title": entry_info_dict["title"],
             "description": entry_info_dict["title"],
             "duration": entry_info_dict["duration"],

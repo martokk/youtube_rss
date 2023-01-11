@@ -420,22 +420,6 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
-name = "importlib-metadata"
-version = "4.13.0"
-description = "Read metadata from Python packages"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-zipp = ">=0.5"
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
-perf = ["ipython"]
-testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)"]
-
-[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -1042,7 +1026,7 @@ typing-extensions = ">=3.7.4"
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.6"
+version = "0.0.8"
 description = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
 category = "main"
 optional = false
@@ -1050,21 +1034,8 @@ python-versions = ">=3.6.1,<4.0.0"
 
 [package.dependencies]
 pydantic = ">=1.8.2,<2.0.0"
-SQLAlchemy = ">=1.4.17,<1.5.0"
+SQLAlchemy = ">=1.4.17,<=1.4.41"
 sqlalchemy2-stubs = "*"
-
-[[package]]
-name = "sqlmodel-basecrud"
-version = "0.1.9"
-description = "Simple package that provides base CRUD operations for your models."
-category = "main"
-optional = false
-python-versions = ">=3.7,<4.0"
-
-[package.dependencies]
-importlib-metadata = ">=4.11.4,<5.0.0"
-SQLAlchemy = "1.4.35"
-sqlmodel = ">=0.0.6,<0.0.7"
 
 [[package]]
 name = "starlette"
@@ -1205,6 +1176,17 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "wheel"
+version = "0.38.4"
+description = "A built-package format for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+test = ["pytest (>=3.0.0)"]
+
+[[package]]
 name = "win32-setctime"
 version = "1.1.0"
 description = "A small Python utility to set file creation time on Windows"
@@ -1239,22 +1221,10 @@ mutagen = "*"
 pycryptodomex = "*"
 websockets = "*"
 
-[[package]]
-name = "zipp"
-version = "3.11.0"
-description = "Backport of pathlib-compatible object wrapper for zip files"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)"]
-testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "d2a68f9945add0db2e2ab5d9dc4d9eba122793702606da432705f04b083f0cee"
+content-hash = "16ce6d5317715482da283eba9fadde3562af63347e51dfea67212cd26b1e2800"
 
 [metadata.files]
 anyio = [
@@ -1657,10 +1627,6 @@ identify = [
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
-]
-importlib-metadata = [
-    {file = "importlib_metadata-4.13.0-py3-none-any.whl", hash = "sha256:8a8a81bcf996e74fee46f0d16bd3eaa382a7eb20fd82445c3ad11f4090334116"},
-    {file = "importlib_metadata-4.13.0.tar.gz", hash = "sha256:dd0173e8f150d6815e098fd354f6414b0f079af4644ddfe90c71e2fc6174346d"},
 ]
 iniconfig = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
@@ -2155,12 +2121,8 @@ sqlalchemy2-stubs = [
     {file = "sqlalchemy2_stubs-0.0.2a31-py3-none-any.whl", hash = "sha256:515a97fbe4b7cd299b43166c51ce6f356f1222128bf2ba57b0619ce8d89dfab4"},
 ]
 sqlmodel = [
-    {file = "sqlmodel-0.0.6-py3-none-any.whl", hash = "sha256:c5fd8719e09da348cd32ce2a5b6a44f289d3029fa8f1c9818229b6f34f1201b4"},
-    {file = "sqlmodel-0.0.6.tar.gz", hash = "sha256:3b4f966b9671b24d85529d274e6c4dbc7753b468e35d2d6a40bd75cad1f66813"},
-]
-sqlmodel-basecrud = [
-    {file = "sqlmodel-basecrud-0.1.9.tar.gz", hash = "sha256:9c97a371684974c7ca987ab2c7849e7d3548523aa072c7c0f0cfba88f8deece8"},
-    {file = "sqlmodel_basecrud-0.1.9-py3-none-any.whl", hash = "sha256:e44379d730e49955eedce787f1da7989429194c41d11d68544074d3867239824"},
+    {file = "sqlmodel-0.0.8-py3-none-any.whl", hash = "sha256:0fd805719e0c5d4f22be32eb3ffc856eca3f7f20e8c7aa3e117ad91684b518ee"},
+    {file = "sqlmodel-0.0.8.tar.gz", hash = "sha256:3371b4d1ad59d2ffd0c530582c2140b6c06b090b32af9b9c6412986d7b117036"},
 ]
 starlette = [
     {file = "starlette-0.22.0-py3-none-any.whl", hash = "sha256:b5eda991ad5f0ee5d8ce4c4540202a573bb6691ecd0c712262d0bc85cf8f2c50"},
@@ -2277,6 +2239,10 @@ websockets = [
     {file = "websockets-10.4-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:05a7233089f8bd355e8cbe127c2e8ca0b4ea55467861906b80d2ebc7db4d6b72"},
     {file = "websockets-10.4.tar.gz", hash = "sha256:eef610b23933c54d5d921c92578ae5f89813438fded840c2e9809d378dc765d3"},
 ]
+wheel = [
+    {file = "wheel-0.38.4-py3-none-any.whl", hash = "sha256:b60533f3f5d530e971d6737ca6d58681ee434818fab630c83a734bb10c083ce8"},
+    {file = "wheel-0.38.4.tar.gz", hash = "sha256:965f5259b566725405b05e7cf774052044b1ed30119b5d586b2703aafe8719ac"},
+]
 win32-setctime = [
     {file = "win32_setctime-1.1.0-py3-none-any.whl", hash = "sha256:231db239e959c2fe7eb1d7dc129f11172354f98361c4fa2d6d2d7e278baa8aad"},
     {file = "win32_setctime-1.1.0.tar.gz", hash = "sha256:15cf5750465118d6929ae4de4eb46e8edae9a5634350c01ba582df868e932cb2"},
@@ -2350,8 +2316,4 @@ wrapt = [
 yt-dlp = [
     {file = "yt-dlp-2022.11.11.tar.gz", hash = "sha256:f6b962023c17a77151476f0f6ed71be87d017629ba5d9994528bc548521191b6"},
     {file = "yt_dlp-2022.11.11-py2.py3-none-any.whl", hash = "sha256:8bb7bd9ab2e6ecf4db7627e9151ce00572ae7ee24dedc78f611e7467b0ccd7d9"},
-]
-zipp = [
-    {file = "zipp-3.11.0-py3-none-any.whl", hash = "sha256:83a28fcb75844b5c0cdaf5aa4003c2d728c77e05f5aeabe8e95e56727005fbaa"},
-    {file = "zipp-3.11.0.tar.gz", hash = "sha256:a7a22e05929290a67401440b39690ae6563279bced5f314609d9d03798f56766"},
 ]

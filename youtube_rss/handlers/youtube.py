@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Type
 
 import datetime
 import re
 
-from dateutil import tz
+from yt_dlp.extractor.common import InfoExtractor
 
 from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE
@@ -15,8 +15,8 @@ class YoutubeHandler(ServiceHandler):
     USE_PROXY = True
     MEDIA_URL_REFRESH_INTERVAL = 60 * 60 * 8  # 8 Hours
     DOMAINS = ["youtube.com"]
-    YTDLP_CUSTOM_EXTRACTORS = []
-    YDL_OPT_ALLOWED_EXTRACTORS = []
+    YTDLP_CUSTOM_EXTRACTORS: list[Type[InfoExtractor]] = []
+    YDL_OPT_ALLOWED_EXTRACTORS: list[str] = []
 
     def sanitize_video_url(self, url: str) -> str:
         """
@@ -115,7 +115,7 @@ class YoutubeHandler(ServiceHandler):
         """
         released_at = (
             datetime.datetime.strptime(entry_info_dict["upload_date"], "%Y%m%d").replace(
-                tzinfo=tz.tzutc()
+                tzinfo=datetime.timezone.utc
             )
             if entry_info_dict.get("upload_date")
             else None
@@ -129,7 +129,7 @@ class YoutubeHandler(ServiceHandler):
             "released_at": released_at,
             "media_url": None,
             "media_filesize": None,
-            "added_at": datetime.datetime.now(tz=tz.tzutc()),
+            "added_at": datetime.datetime.now(tz=datetime.timezone.utc),
         }
 
     def map_video_info_dict_entity_to_video_dict(
@@ -151,7 +151,7 @@ class YoutubeHandler(ServiceHandler):
             "filesize_approx", 0
         )
         released_at = datetime.datetime.strptime(entry_info_dict["upload_date"], "%Y%m%d").replace(
-            tzinfo=tz.tzutc()
+            tzinfo=datetime.timezone.utc
         )
         return {
             "title": entry_info_dict["title"],
