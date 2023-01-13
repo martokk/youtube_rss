@@ -1,5 +1,3 @@
-from typing import Callable
-
 from datetime import datetime, timedelta
 
 import jwt
