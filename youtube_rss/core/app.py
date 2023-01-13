@@ -13,6 +13,7 @@ from youtube_rss.core.logger import logger
 from youtube_rss.core.notify import notify
 from youtube_rss.crud.source import refresh_all_sources
 from youtube_rss.crud.video import refresh_all_videos
+from youtube_rss.db.database import create_db_and_tables
 from youtube_rss.paths import FEEDS_PATH
 from youtube_rss.views.router import views_router
 
@@ -34,6 +35,8 @@ async def on_startup() -> None:
     logger.debug("Starting FastAPI App...")
     if NOTIFY_ON_START:
         await notify(text=f"YoutubeRSS('{ENV_NAME}') started.")
+
+    # await create_db_and_tables()
 
 
 @app.on_event("startup")  # type: ignore
