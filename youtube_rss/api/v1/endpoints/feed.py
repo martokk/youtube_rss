@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import HTMLResponse
 
@@ -25,7 +27,7 @@ async def get_rss(source_id: str) -> Response:
 
 
 @router.put("/{source_id}", response_class=HTMLResponse)
-async def build_rss(source_id: str, _=Depends(authenticated_user())) -> Response:
+async def build_rss(source_id: str, _: Any = Depends(authenticated_user())) -> Response:
     """
     Builds a new rss file for source_id and returns it as a Response.
     """
@@ -45,7 +47,7 @@ async def build_rss(source_id: str, _=Depends(authenticated_user())) -> Response
 
 
 @router.delete("/{source_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_rss(source_id: str, _=Depends(authenticated_user())) -> None:
+async def delete_rss(source_id: str, _: Any = Depends(authenticated_user())) -> None:
     """
     Deletes the .rss file for a feed.
     """

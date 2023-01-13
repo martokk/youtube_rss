@@ -32,7 +32,7 @@ class AuthHandler:
         Returns:
             str: Hashed password.
         """
-        return self.pwd_context.hash(secret=password)
+        return str(self.pwd_context.hash(secret=password))
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """
@@ -45,7 +45,7 @@ class AuthHandler:
         Returns:
             bool: True if plain password matches the hashed password, False otherwise.
         """
-        return self.pwd_context.verify(secret=plain_password, hash=hashed_password)
+        return bool(self.pwd_context.verify(secret=plain_password, hash=hashed_password))
 
     def encode_access_token(self, user_id: str) -> str:
         """
@@ -95,7 +95,9 @@ class AuthHandler:
             HTTPException: when token is expired or invalid.
         """
         try:
-            payload = jwt.decode(jwt=token, key=JWT_SECRET_KEY, algorithms=[ALGORITHM])
+            payload: dict[str, str] = jwt.decode(
+                jwt=token, key=JWT_SECRET_KEY, algorithms=[ALGORITHM]
+            )
         except jwt.ExpiredSignatureError as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Expired Token"
@@ -129,7 +131,7 @@ class AuthHandler:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
             ) from e
-        return payload["sub"]
+        return str(payload["sub"])
 
     def auth_wrapper(self, auth: HTTPAuthorizationCredentials = Security(security)) -> str:
         """

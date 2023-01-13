@@ -37,6 +37,7 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
 
         Args:
             url: The URL to create the source from.
+            user_id(str): The user id
 
         Returns:
             The created source.

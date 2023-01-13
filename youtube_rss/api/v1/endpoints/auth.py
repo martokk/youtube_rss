@@ -26,7 +26,7 @@ async def register(user_create: UserCreate) -> UserDB:
     Args:
         user_create (UserCreate): the user information for registration
 
-    UserDB:
+    Returns:
         UserDB: an UserDB object
 
     Raises:
@@ -86,7 +86,7 @@ async def login(user_login: UserLogin) -> dict[str, str]:
 
 
 @router.get("/protected")
-def protected(user_id=Depends(get_active_user_id())) -> dict[str, bool | Any]:
+def protected(user_id: str = Depends(get_active_user_id())) -> dict[str, bool | Any]:
     """
     Protected endpoint, can be accessed only by authenticated users
 

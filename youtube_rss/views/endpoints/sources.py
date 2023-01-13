@@ -17,8 +17,15 @@ async def read_root(request: Request, username: str) -> Response:
     """
     Server root. Returns html response of all sources.
 
+    Args:
+        request(Request): The request object
+        username: The username to display
+
     Returns:
         Response: HTML page with list of sources
+
+    Raises:
+        HTTPException: User not found
     """
     try:
         user = await user_crud.get(username=username)

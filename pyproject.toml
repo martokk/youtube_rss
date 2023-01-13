@@ -98,6 +98,7 @@ exclude = '''
     | env
     | venv
     | typings
+    | migrations
 )/
 '''
 
@@ -114,7 +115,7 @@ multi_line_output = 3
 indent = 4
 color_output = true
 skip = ["pyqt5_ui.py", "resources_rc.py"]
-skip_glob = [".venv/*", "typings/*"]
+skip_glob = [".venv/*", "typings/*", "migrations/*"]
 
 [tool.mypy]
 # https://mypy.readthedocs.io/en/latest/config_file.html#using-a-pyproject-toml-file

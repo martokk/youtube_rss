@@ -19,26 +19,11 @@ PYINSTALLER_ENTRY := $(PROJECT)/__main__.py
 install-poetry: ## Download and install Poetry
 	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | $(PYTHON) -
 
-.PHONY: uninstall-poetry
-uninstall-poetry: ## Uninstall Poetry
-	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | $(PYTHON) - --uninstall
-
-.PHONY: install-pyinstaller
-install-pyinstaller: ## Download and install PyInstaller
-	poetry run sudo apt install libpython3.10-dev -y
-	poetry add --group dev pyinstaller@latest pillow@latest
-
-.PHONY: remove-pyinstaller
-remove-pyinstaller: ## Uninstall PyInstaller
-	poetry remove --group dev pyinstaller@latest pillow@latest
 
 .PHONY: install-pre-commit-hooks
 install-pre-commit-hooks: ## Install Pre-Commit Git Hooks
 	poetry run pre-commit install
 
-.PHONY: install-pyqt5
-install-pyqt5: ## Install PyQt5
-	poetry add PyQt5@latest
 
 #-----------------------------------------------------------------------------------------
 # INSTALL/UPDATE DEPENDENCIES/REQUIREMENTS
@@ -75,15 +60,15 @@ formatting: codestyle ## Apply Formatting via PyUpgrade, ISort, Black.
 
 .PHONY: codestyle
 codestyle: ## Apply Formatting via PyUpgrade, ISort, Black.
-	poetry run pyupgrade --exit-zero-even-if-changed --py310-plus **/*.py
-	poetry run isort --settings-path pyproject.toml ./
-	poetry run black --config pyproject.toml ./
+	poetry run pyupgrade --exit-zero-even-if-changed --py310-plus **/*.py; echo ""
+	poetry run isort --settings-path pyproject.toml ./; echo ""
+	poetry run black --config pyproject.toml ./; echo ""
 
 .PHONY: check-codestyle
 check-codestyle: ## Check Formatting via ISort, Black, darglint.
-	poetry run isort --diff --check-only --settings-path pyproject.toml ./
-	poetry run black --diff --check --config pyproject.toml ./
-	poetry run darglint --verbosity 2 $(PROJECT) tests
+	poetry run isort --diff --check-only --settings-path pyproject.toml ./; echo ""
+	poetry run black --diff --check --config pyproject.toml ./; echo ""
+	poetry run darglint --verbosity 2 $(PROJECT) tests; echo ""
 
 .PHONY: check-safety
 check-safety: ## Check Securty & Safty via Bandit, Safety.
@@ -116,96 +101,6 @@ build-package: ## Build as Package
 	poetry build
 
 
-#-----------------------------------------------------------------------------------------
-# BUILD EXECUTABLE
-#-----------------------------------------------------------------------------------------
-.PHONY: build-pyinstaller-linux
-build-pyinstaller-linux: ## Build Linux Executable
-	pyinstaller $(PYINSTALLER_ENTRY) \
-		--clean \
-		--onefile \
-		--windowed \
-		--paths=$(PWD)/$(PROJECT) \
-		--icon=$(PWD)/assets/images/icon.png \
-		--workpath=$(PWD)/build_linux \
-		--distpath=$(PWD)/dist_linux \
-		--name=$(PROJECT) \
-		--copy-metadata=$(PROJECT)
-
-.PHONY: build-pyinstaller-win
-build-pyinstaller-win: ## Build Windows Executable
-	pyinstaller $(PYINSTALLER_ENTRY) \
-		--clean \
-		--onefile \
-		--windowed \
-		--paths=$(PWD)/$(PROJECT) \
-		--icon=$(PWD)/assets/images/icon.png \
-		--workpath=$(PWD)/build_win \
-		--distpath=$(PWD)/dist_win \
-		--name=$(PROJECT) \
-		--copy-metadata=$(PROJECT)
-
-
-#-----------------------------------------------------------------------------------------
-# BUILD RESOURCES
-#-----------------------------------------------------------------------------------------
-.PHONY: build-pyqt5-resources
-build-pyqt5-resources: ## Build PyQt5 Resources File
-	pyrcc5 $(PWD)/assets/ui/resources.qrc -o $(PWD)/$(PROJECT)/resources_rc.py
-
-.PHONY: build-pyqt5-ui
-build-pyqt5-ui: ## Build PyQt5 QtDesigner UI File
-	pyuic5 -x $(PWD)/assets/ui/pyqt5_ui.ui -o $(PWD)/$(PROJECT)/pyqt5_ui.py
-
-.PHONY: build-desktop-file
-build-desktop-file: ## Build .desktop File
-	printf "[Desktop Entry]\nName=$(PROJECT_TITLE)\nIcon=$(PWD)/assets/images/icon.png\nType=Application\nExec=$(PWD)/dist_linux/$(PROJECT)\nTerminal=false" > "$(PWD)/dist_linux/$(PROJECT).desktop"
-
-
-
-#-----------------------------------------------------------------------------------------
-# INSTALL EXECUTABLE, SHORTCUTS, RESOURCES
-#-----------------------------------------------------------------------------------------
-.PHONY: install-linux
-install-linux: install-linux-executable install-linux-user-config  install-desktop-file ## Full Installl of Executable, User Config(won't overwrite), Desktop File
-	echo "Completed Install."
-
-.PHONY: install-linux-executable
-install-linux-executable: ## Installs binary in ~/bin
-	mkdir -p $(HOME)/bin
-	ln -sfv $(PWD)/dist_linux/$(PROJECT) /home/${USER}/bin/$(PROJECT)
-
-.PHONY: install-linux-user-config
-install-linux-user-config: ## Installs config in ~/.vapps
-	test -f $(PWD)/$(PROJECT)/.vapps/$(PROJECT).yaml && mkdir -p $(HOME)/.vapps || echo ""
-	test -f $(PWD)/$(PROJECT)/.vapps/$(PROJECT).yaml && cp -n $(PWD)/$(PROJECT)/.vapps/$(PROJECT).yaml $(HOME)/.vapps/$(PROJECT).yaml || echo ""
-
-.PHONY: install-desktop-file
-install-desktop-file: build-desktop-file ## Install .desktop shortcut for user
-	desktop-file-install --dir=$(HOME)/.local/share/applications "$(PWD)/dist_linux/$(PROJECT).desktop"
-	update-desktop-database $(HOME)/.local/share/applications
-
-.PHONY: update-desktop-database
-update-desktop-database: ## Updates Linux database of .desktop shortcuts
-	update-desktop-database $(HOME)/.local/share/applications
-
-
-
-#-----------------------------------------------------------------------------------------
-# DJANGO
-#-----------------------------------------------------------------------------------------
-.PHONY: django-migrate
-django-migrate: ## Applies Django Migrations
-	poetry run python "$(PWD)/$(PROJECT)/manage.py" migrate
-	poetry run python "$(PWD)/$(PROJECT)/manage.py" makemigrations
-
-.PHONY: django-createsuperuser
-django-createsuperuser: ## Creates a Django Superuser
-	poetry run python "$(PWD)/$(PROJECT)/manage.py" createsuperuser
-
-.PHONY: django-runserver
-django-runserver: ## Runs Django Server
-	poetry run python $(PWD)/$(PROJECT)/manage.py runserver
 
 #-----------------------------------------------------------------------------------------
 # DOCKER

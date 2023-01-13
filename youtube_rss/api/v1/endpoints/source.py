@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from youtube_rss.api.v1.deps import authenticated_user, get_active_user_id
@@ -17,7 +19,9 @@ ModelCreateClass = SourceCreate
 
 
 @router.post("/", response_model=ModelReadClass, status_code=status.HTTP_201_CREATED)
-async def create(in_obj: ModelCreateClass, user_id=Depends(get_active_user_id())) -> ModelClass:
+async def create(
+    in_obj: ModelCreateClass, user_id: str = Depends(get_active_user_id())
+) -> ModelClass:
     """
     Create a new item.
     """
@@ -28,7 +32,7 @@ async def create(in_obj: ModelCreateClass, user_id=Depends(get_active_user_id())
 
 
 @router.get("/{id}", response_model=ModelReadClass)
-async def get(id: str, _=Depends(authenticated_user())) -> ModelClass | None:
+async def get(id: str, _: Any = Depends(authenticated_user())) -> ModelClass | None:
     """
     Get an item.
     """
@@ -41,7 +45,7 @@ async def get(id: str, _=Depends(authenticated_user())) -> ModelClass | None:
 
 
 @router.get("/", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
-async def get_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
+async def get_all(_: Any = Depends(authenticated_user())) -> list[ModelClass] | None:
     """
     Get all items.
     """
@@ -49,7 +53,9 @@ async def get_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
 
 
 @router.patch("/{id}", response_model=ModelReadClass)
-async def update(id: str, in_obj: ModelCreateClass, _=Depends(authenticated_user())) -> ModelClass:
+async def update(
+    id: str, in_obj: ModelCreateClass, _: Any = Depends(authenticated_user())
+) -> ModelClass:
     """
     Update an item.
     """
@@ -62,7 +68,7 @@ async def update(id: str, in_obj: ModelCreateClass, _=Depends(authenticated_user
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete(id: str, _=Depends(authenticated_user())) -> None:
+async def delete(id: str, _: Any = Depends(authenticated_user())) -> None:
     """
     Delete an item.
     """
@@ -75,7 +81,7 @@ async def delete(id: str, _=Depends(authenticated_user())) -> None:
 
 
 @router.put("/{source_id}/fetch", response_model=SourceRead)
-async def fetch_source(source_id: str, _=Depends(authenticated_user())) -> Source:
+async def fetch_source(source_id: str, _: Any = Depends(authenticated_user())) -> Source:
     """
     Fetches new data from yt-dlp and updates a source on the server.
 
@@ -97,7 +103,7 @@ async def fetch_source(source_id: str, _=Depends(authenticated_user())) -> Sourc
 
 
 @router.put("/fetch", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
-async def fetch_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
+async def fetch_all(_: Any = Depends(authenticated_user())) -> list[ModelClass] | None:
     """
     Fetch all sources.
     """

@@ -1,7 +1,8 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from youtube_rss.api.v1.deps import authenticated_user
-from youtube_rss.core.auth import AuthHandler
 from youtube_rss.crud.exceptions import RecordAlreadyExistsError, RecordNotFoundError
 from youtube_rss.crud.video import video_crud
 from youtube_rss.models.video import Video, VideoCreate, VideoRead
@@ -14,7 +15,7 @@ ModelCreateClass = VideoCreate
 
 
 @router.post("/", response_model=ModelReadClass, status_code=status.HTTP_201_CREATED)
-async def create(in_obj: ModelCreateClass, _=Depends(authenticated_user())) -> ModelClass:
+async def create(in_obj: ModelCreateClass, _: Any = Depends(authenticated_user())) -> ModelClass:
     """
     Create a new item.
     """
@@ -25,7 +26,7 @@ async def create(in_obj: ModelCreateClass, _=Depends(authenticated_user())) -> M
 
 
 @router.get("/{id}", response_model=ModelReadClass)
-async def get(id: str, _=Depends(authenticated_user())) -> ModelClass | None:
+async def get(id: str, _: Any = Depends(authenticated_user())) -> ModelClass | None:
     """
     Get an item.
     """
@@ -38,7 +39,7 @@ async def get(id: str, _=Depends(authenticated_user())) -> ModelClass | None:
 
 
 @router.get("/", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
-async def get_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
+async def get_all(_: Any = Depends(authenticated_user())) -> list[ModelClass] | None:
     """
     Get all items.
     """
@@ -46,7 +47,9 @@ async def get_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
 
 
 @router.patch("/{id}", response_model=ModelReadClass)
-async def update(id: str, in_obj: ModelCreateClass, _=Depends(authenticated_user())) -> ModelClass:
+async def update(
+    id: str, in_obj: ModelCreateClass, _: Any = Depends(authenticated_user())
+) -> ModelClass:
     """
     Update an item.
     """
@@ -59,7 +62,7 @@ async def update(id: str, in_obj: ModelCreateClass, _=Depends(authenticated_user
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete(id: str, _=Depends(authenticated_user())) -> None:
+async def delete(id: str, _: Any = Depends(authenticated_user())) -> None:
     """
     Delete an item.
     """
@@ -72,7 +75,7 @@ async def delete(id: str, _=Depends(authenticated_user())) -> None:
 
 
 @router.put("/{id}/fetch", response_model=VideoRead)
-async def fetch_video(id: str, _=Depends(authenticated_user())) -> Video:
+async def fetch_video(id: str, _: Any = Depends(authenticated_user())) -> Video:
     """
     Fetches new data from yt-dlp and updates a video on the server.
 
@@ -94,7 +97,7 @@ async def fetch_video(id: str, _=Depends(authenticated_user())) -> Video:
 
 
 @router.put("/fetch", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
-async def fetch_all(_=Depends(authenticated_user())) -> list[ModelClass] | None:
+async def fetch_all(_: Any = Depends(authenticated_user())) -> list[ModelClass] | None:
     """
     Fetch all Videos.
     """
