@@ -649,7 +649,7 @@ $RECYCLE.BIN/
 # Credentials
 .credentials
 
-# Linux & Windows Build/Dist 
+# Linux & Windows Build/Dist
 build_linux/
 build_win/
 dist_linux/
@@ -667,5 +667,3 @@ youtube_rss/data/.env
 *.sqlite3
 
 *.old
-
-migrations/versions/
