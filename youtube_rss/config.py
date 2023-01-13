@@ -27,9 +27,17 @@ DATABASE_ECHO = os.environ.get("DATABASE_ECHO", "True") == "True"
 # Log
 LOG_LEVEL = str(os.environ.get("LOG_LEVEL", "INFO")).upper()
 
+# Authentication
+ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+ALGORITHM = "HS256"
+JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]  # should be kept secret
+JWT_REFRESH_SECRET_KEY = os.environ["JWT_REFRESH_SECRET_KEY"]  #
+
 # Notify
 TELEGRAM_API_TOKEN = str(os.environ.get("TELEGRAM_API_TOKEN"))
 TELEGRAM_CHAT_ID = int(os.environ.get("TELEGRAM_CHAT_ID", 0))
+NOTIFY_ON_START = os.environ.get("NOTIFY_ON_START", "True") == "True"
 
 # Build Feed
 BUILD_FEED_RECENT_VIDEOS = int(os.environ.get("BUILD_FEED_RECENT_VIDEOS", 20))

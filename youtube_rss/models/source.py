@@ -10,6 +10,7 @@ from youtube_rss.handlers import get_handler_from_url
 from youtube_rss.services.uuid import generate_uuid_from_url
 
 if TYPE_CHECKING:
+    from youtube_rss.models.user import UserDB
     from youtube_rss.models.video import Video
 
 
@@ -31,6 +32,7 @@ class SourceBase(SQLModel):
     handler: str = Field(default=None)
     added_at: datetime.datetime = Field(default=None)
     updated_at: datetime.datetime = Field(default=None)
+    created_by: str = Field(default=None, foreign_key="userdb.id", nullable=False)
 
 
 class Source(SourceBase, table=True):
@@ -40,6 +42,7 @@ class Source(SourceBase, table=True):
             "cascade": "all, delete",  # Instruct the ORM how to track changes to local objects
         },
     )
+    created_user: "UserDB" = Relationship(back_populates="sources")
 
     @root_validator(pre=True)
     def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:

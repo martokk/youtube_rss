@@ -667,3 +667,5 @@ youtube_rss/data/.env
 *.sqlite3
 
 *.old
+
+migrations/versions/

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import HTMLResponse
 
+from youtube_rss.api.v1.deps import authenticated_user
 from youtube_rss.crud.exceptions import RecordNotFoundError
 from youtube_rss.crud.source import source_crud
 from youtube_rss.services.feed import build_rss_file, delete_rss_file, get_rss_file
@@ -24,7 +25,7 @@ async def get_rss(source_id: str) -> Response:
 
 
 @router.put("/{source_id}", response_class=HTMLResponse)
-async def build_rss(source_id: str) -> Response:
+async def build_rss(source_id: str, _=Depends(authenticated_user())) -> Response:
     """
     Builds a new rss file for source_id and returns it as a Response.
     """
@@ -44,7 +45,7 @@ async def build_rss(source_id: str) -> Response:
 
 
 @router.delete("/{source_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_rss(source_id: str) -> None:
+async def delete_rss(source_id: str, _=Depends(authenticated_user())) -> None:
     """
     Deletes the .rss file for a feed.
     """

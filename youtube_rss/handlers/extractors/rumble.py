@@ -271,7 +271,7 @@ class CustomRumbleChannelIE(RumbleChannelIE):
 
         # description = re.search(r'<p class="description"\s*>(.+?)</p>', container).group(1)
 
-        timestamp_match = re.search(r'datetime=([^">]+)>', container)
+        timestamp_match = re.search(r'datetime=([^\s">]+)', container)
         timestamp = parse_iso8601(timestamp_match.group(1)) if timestamp_match else None
 
         thumbnail_match = re.search(r"src=([^\s>]+)", container)

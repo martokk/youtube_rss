@@ -1,4 +1,4 @@
-from typing import Any, overload
+from typing import Any
 
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import Session
@@ -32,7 +32,7 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
                 logger.warning(e)
         return await super().delete(*args, **kwargs)
 
-    async def create_source_from_url(self, url: str) -> Source:
+    async def create_source_from_url(self, url: str, user_id: str) -> Source:
         """Create a new source from a URL.
 
         Args:
@@ -57,7 +57,9 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
             url=url,
             extract_flat=True,
         )
-        source = await get_source_from_source_info_dict(source_info_dict=source_info_dict)
+        source = await get_source_from_source_info_dict(
+            source_info_dict=source_info_dict, user_id=user_id
+        )
 
         # Save the source to the database
         db_source = await self.create(source)
@@ -84,7 +86,9 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceRead]):
             url=db_source.url,
             extract_flat=True,
         )
-        source = await get_source_from_source_info_dict(source_info_dict=source_info_dict)
+        source = await get_source_from_source_info_dict(
+            source_info_dict=source_info_dict, user_id=db_source.created_by
+        )
         db_source = await self.update(in_obj=SourceCreate(**source.dict()), id=source_id)
 
         # Update Source Videos from Fetched Videos

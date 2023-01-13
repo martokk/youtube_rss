@@ -49,12 +49,15 @@ async def get_source_info_dict(
     return _source_info_dict
 
 
-async def get_source_from_source_info_dict(source_info_dict: dict[str, Any]) -> Source:
+async def get_source_from_source_info_dict(
+    source_info_dict: dict[str, Any], user_id: str
+) -> Source:
     """
     Get a `Source` object from a source_info_dict.
 
     Parameters:
         source_info_dict (dict): The source_info_dict.
+        user_id (str): user_id of authenticated user.
 
     Returns:
         Source: The `Source` object.
@@ -62,9 +65,10 @@ async def get_source_from_source_info_dict(source_info_dict: dict[str, Any]) -> 
     handler = get_handler_from_url(url=source_info_dict["metadata"]["url"])
     source_videos = await get_source_videos_from_source_info_dict(source_info_dict=source_info_dict)
     return Source(
+        created_by=user_id,
         **handler.map_source_info_dict_to_source_dict(
             source_info_dict=source_info_dict, source_videos=source_videos
-        )
+        ),
     )
 
 
