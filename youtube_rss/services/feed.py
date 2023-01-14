@@ -3,7 +3,7 @@ from pathlib import Path
 
 from feedgen.feed import FeedGenerator
 
-from youtube_rss.config import BASE_URL
+from youtube_rss import settings
 from youtube_rss.core.logger import logger
 from youtube_rss.models.source import Source
 from youtube_rss.paths import FEEDS_PATH
@@ -31,7 +31,7 @@ class SourceFeedGenerator(FeedGenerator):
             source: The source to retrieve data from.
         """
         self.title(source.name)
-        self.link(href=f"{BASE_URL}{source.feed_url}", rel="self")
+        self.link(href=f"{settings.base_url}{source.feed_url}", rel="self")
         self.id(source.id)
         self.author({"name": source.author})
         self.link(href=source.url, rel="alternate")
@@ -61,7 +61,7 @@ class SourceFeedGenerator(FeedGenerator):
             post.link(href=video.url)
             post.description(video.description or " ")
             post.enclosure(
-                url=f"{BASE_URL}{video.feed_media_url}",
+                url=f"{settings.base_url}{video.feed_media_url}",
                 length=str(video.media_filesize),
                 type="video/mp4",
             )  # TODO: Handle non-mp4 files as well

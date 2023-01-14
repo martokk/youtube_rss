@@ -56,6 +56,7 @@ feedgen = "^0.9.0"
 jinja2 = "^3.1.2"
 python-multipart = "^0.0.5"
 alembic = "^1.9.1"
+asyncpg = "^0.27.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -77,6 +78,8 @@ coverage = "^6.1.2"
 coverage-badge = "^1.1.0"
 pytest-html = "^3.1.1"
 pytest-cov = "^4.0.0"
+trio = "^0.22.0"
+pytest-asyncio = "^0.20.3"
 
 [tool.black]
 # https://github.com/psf/black
@@ -152,6 +155,8 @@ ignore_errors = true
 # Directories that are not visited by pytest collector:
 norecursedirs =["hooks", "*.egg", ".eggs", "dist", "build", "docs", ".tox", ".git", "__pycache__"]
 doctest_optionflags = ["NUMBER", "NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL"]
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+asyncio_mode="auto"
 
 # Extra options:
 addopts = [

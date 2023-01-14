@@ -2,7 +2,7 @@ from typing import Any
 
 import datetime
 
-from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
+from youtube_rss import settings
 from youtube_rss.handlers.extractors.rumble import (
     CustomRumbleChannelIE,
     CustomRumbleEmbedIE,
@@ -75,8 +75,8 @@ class RumbleHandler(ServiceHandler):
             **YDL_OPTS_BASE,
             "playlistreverse": True,
             "extract_flat": extract_flat,
-            "playlistend": BUILD_FEED_RECENT_VIDEOS,
-            "dateafter": BUILD_FEED_DATEAFTER,
+            "playlistend": settings.build_feed_recent_videos,
+            "dateafter": settings.build_feed_dateafter,
             "allowed_extractors": self.YDL_OPT_ALLOWED_EXTRACTORS,
         }
 

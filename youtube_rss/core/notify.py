@@ -3,7 +3,7 @@ from typing import Any
 from telegram import Bot
 from telegram.error import BadRequest
 
-from youtube_rss.config import TELEGRAM_API_TOKEN, TELEGRAM_CHAT_ID
+from youtube_rss import settings
 from youtube_rss.core.logger import logger
 
 
@@ -20,14 +20,14 @@ async def notify(text: str) -> Any:
     Raises:
         ValueError: If the chat with the Telegram bot has not been initialized by the user
     """
-    if not TELEGRAM_API_TOKEN or TELEGRAM_CHAT_ID == 0:
-        logger.warning("TELEGRAM_API_TOKEN or TELEGRAM_CHAT_ID config variables are not set.")
+    if not settings.telegram_api_token or settings.telegram_chat_id == 0:
+        logger.warning("TELEGRAM_API_TOKEN or TELEGRAM_CHAT_ID settings variables are not set.")
         return None
 
-    bot = Bot(token=TELEGRAM_API_TOKEN)
+    bot = Bot(token=settings.telegram_api_token)
 
     try:
-        return await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text)
+        return await bot.send_message(chat_id=settings.telegram_chat_id, text=text)
     except BadRequest as e:
         raise ValueError(
             "The chat with the Telegram bot has not been first initialized by the user. "

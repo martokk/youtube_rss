@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
+from sqlmodel import Session
 
-from youtube_rss.config import BASE_DOMAIN
-from youtube_rss.crud.exceptions import RecordNotFoundError
-from youtube_rss.crud.user import user_crud
+from youtube_rss import crud, settings
+from youtube_rss.api.deps import get_db
 
 router = APIRouter()
 templates = Jinja2Templates(directory="youtube_rss/views/templates")
@@ -13,13 +13,14 @@ templates = Jinja2Templates(directory="youtube_rss/views/templates")
 @router.get(
     "/u/{username}", summary="Returns HTML Reponse with list of feeds", response_class=HTMLResponse
 )
-async def read_root(request: Request, username: str) -> Response:
+async def read_root(request: Request, username: str, db: Session = Depends(get_db)) -> Response:
     """
     Server root. Returns html response of all sources.
 
     Args:
         request(Request): The request object
         username: The username to display
+        db(Session): The database session.
 
     Returns:
         Response: HTML page with list of sources
@@ -28,8 +29,8 @@ async def read_root(request: Request, username: str) -> Response:
         HTTPException: User not found
     """
     try:
-        user = await user_crud.get(username=username)
-    except RecordNotFoundError as e:
+        user = await crud.user.get(username=username, db=db)
+    except crud.RecordNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
@@ -39,7 +40,7 @@ async def read_root(request: Request, username: str) -> Response:
         {
             "name": source.name,
             "url": source.url,
-            "pktc_subscription_url": f"pktc://subscribe/{BASE_DOMAIN}{source.feed_url}",
+            "pktc_subscription_url": f"pktc://subscribe/{settings.base_domain}{source.feed_url}",
         }
         for source in user.sources
     ]
