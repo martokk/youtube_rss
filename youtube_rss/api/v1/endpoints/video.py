@@ -98,7 +98,7 @@ async def fetch_video(
 
     Args:
         id: The ID of the video to update.
-        db (Session, optional): The database session.
+        db (Session): The database session.
 
     Returns:
         The updated video.

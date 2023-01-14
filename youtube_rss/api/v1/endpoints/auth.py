@@ -57,7 +57,7 @@ async def login(user_login: UserLogin, db: Session = Depends(get_db)) -> dict[st
 
     Args:
         user_login (UserLogin): the user information for login
-        db (Session, optional): The database session.
+        db (Session): The database session.
 
     Returns:
         dict: A dictionary containing the authentication token

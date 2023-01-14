@@ -27,14 +27,14 @@ from .base import BaseCRUD
 
 
 class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceUpdate]):
-    async def delete(self, db: Session, *args: BinaryExpression[Any], **kwargs: Any) -> None:
+    async def delete(self, *args: BinaryExpression[Any], db: Session, **kwargs: Any) -> None:
         source_id = kwargs.get("id")
         if source_id:
             try:
                 await delete_rss_file(source_id=source_id)
             except FileNotFoundError as e:
                 logger.warning(e)
-        return await super().delete(db=db, *args, **kwargs)
+        return await super().delete(*args, db=db, **kwargs)
 
     async def create_source_from_url(self, db: Session, url: str, user_id: str) -> Source:
         """Create a new source from a URL.

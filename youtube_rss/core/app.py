@@ -4,11 +4,11 @@ from fastapi_utils.tasks import repeat_every
 from sqlmodel import Session
 
 from youtube_rss import settings, version
+from youtube_rss.api.deps import get_db
 from youtube_rss.api.v1.router import api_router
 from youtube_rss.core.database import create_db_and_tables
 from youtube_rss.core.logger import logger
 from youtube_rss.core.notify import notify
-from youtube_rss.api.deps import get_db
 from youtube_rss.models.server import HealthCheck
 from youtube_rss.paths import DATABASE_FILE, FEEDS_PATH
 from youtube_rss.services.source import refresh_all_sources
@@ -44,12 +44,12 @@ async def on_startup() -> None:
 
 @app.on_event("startup")  # type: ignore
 @repeat_every(seconds=settings.refresh_sources_interval_minutes * 60, wait_first=True)
-async def repeating_refresh_sources() -> None:
+async def repeating_refresh_sources(db: Session = Depends(get_db)) -> None:
     """
     Fetches new data from yt-dlp for all Videos that meet criteria.
     """
     logger.debug("Refreshing Sources...")
-    refreshed_videos = await refresh_all_sources()
+    refreshed_videos = await refresh_all_sources(db=db)
     logger.success(f"Completed refreshing {len(refreshed_videos)} Sources from yt-dlp.")
 
 

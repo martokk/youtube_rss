@@ -1,7 +1,8 @@
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, PropertyMock, patch
+from typing import Any
 
-import pytest
+from pathlib import Path
+from unittest.mock import MagicMock
+
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -9,7 +10,7 @@ from youtube_rss import crud
 from youtube_rss.services.feed import build_rss_file
 
 
-def test_get_rss_not_found(client: TestClient):
+def test_get_rss_not_found(client: TestClient) -> None:
     response = client.get("/feed/non_existent_source")
     assert response.status_code == 404
     assert response.json()["detail"] == [
@@ -22,8 +23,9 @@ async def test_build_and_get_rss_success(
     tmp_path: Path,
     monkeypatch: MagicMock,
     client: TestClient,
-):
-    def mock(**kwargs):
+) -> None:
+    def mock(**kwargs: Any) -> Path:
+        print(kwargs)
         return tmp_path / f"{source_id}.rss"
 
     # Build an RSS file for a test source
@@ -37,6 +39,7 @@ async def test_build_and_get_rss_success(
     # monkeypatch.return_value = tmp_rss_file_path
 
     rss_file = await build_rss_file(source=source)
+    assert rss_file == tmp_path / f"{source_id}.rss"
 
     # Try accessing the RSS file
     response = client.get(f"/feed/{source_id}")

@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlmodel import Session
 
 from youtube_rss import crud
 from youtube_rss.api.deps import authenticated_user, get_active_user_id, get_db
@@ -16,7 +17,7 @@ router = APIRouter()
 @router.post("/", response_model=ModelReadClass, status_code=status.HTTP_201_CREATED)
 async def create(
     in_obj: ModelCreateClass,
-    db=Depends(get_db),
+    db: Session = Depends(get_db),
     user_id: str = Depends(get_active_user_id()),
 ) -> ModelClass:
     """
@@ -30,7 +31,7 @@ async def create(
 
 @router.get("/{id}", response_model=ModelReadClass)
 async def get(
-    id: str, db=Depends(get_db), _: Any = Depends(authenticated_user())
+    id: str, db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> ModelClass | None:
     """
     Get an item.
@@ -45,7 +46,7 @@ async def get(
 
 @router.get("/", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
 async def get_all(
-    db=Depends(get_db), _: Any = Depends(authenticated_user())
+    db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> list[ModelClass] | None:
     """
     Get all items.
@@ -57,7 +58,7 @@ async def get_all(
 async def update(
     id: str,
     in_obj: ModelCreateClass,
-    db=Depends(get_db),
+    db: Session = Depends(get_db),
     _: Any = Depends(authenticated_user()),
 ) -> ModelClass:
     """
@@ -72,7 +73,9 @@ async def update(
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete(id: str, db=Depends(get_db), _: Any = Depends(authenticated_user())) -> None:
+async def delete(
+    id: str, db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
+) -> None:
     """
     Delete an item.
     """
@@ -86,13 +89,14 @@ async def delete(id: str, db=Depends(get_db), _: Any = Depends(authenticated_use
 
 @router.put("/{source_id}/fetch", response_model=SourceRead)
 async def fetch_source(
-    source_id: str, db=Depends(get_db), _: Any = Depends(authenticated_user())
+    source_id: str, db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> Source:
     """
     Fetches new data from yt-dlp and updates a source on the server.
 
     Args:
         source_id: The ID of the source to update.
+        db(Session): The database session
 
     Returns:
         The updated source.
@@ -110,7 +114,7 @@ async def fetch_source(
 
 @router.put("/fetch", response_model=list[ModelReadClass], status_code=status.HTTP_200_OK)
 async def fetch_all(
-    db=Depends(get_db), _: Any = Depends(authenticated_user())
+    db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> list[ModelClass] | None:
     """
     Fetch all sources.

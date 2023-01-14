@@ -1,6 +1,6 @@
 from typing import Any
 
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 
 import pytest
 import uvicorn
@@ -25,14 +25,14 @@ def test_version_callback(mocker):
     )
 
 
-def test_start_server_success(monkeypatch: Mock):
+def test_start_server_success(monkeypatch: MagicMock) -> None:
     monkeypatch.setattr(uvicorn, "run", lambda *args, **kwargs: None)
     start_server()
     assert True
 
 
-def test_start_server_host_port(monkeypatch: Mock):
-    def mock_run(*args: Any, **kwargs: Any):
+def test_start_server_host_port(monkeypatch: MagicMock) -> None:
+    def mock_run(*args: Any, **kwargs: Any) -> None:
         assert kwargs["host"] == settings.server_host
         assert kwargs["port"] == settings.server_port
 
@@ -40,8 +40,8 @@ def test_start_server_host_port(monkeypatch: Mock):
     start_server()
 
 
-def test_start_server_log_level(monkeypatch: Mock):
-    def mock_run(*args: Any, **kwargs: Any):
+def test_start_server_log_level(monkeypatch: MagicMock) -> None:
+    def mock_run(*args: Any, **kwargs: Any) -> None:
         assert kwargs["log_level"] == settings.log_level.lower()
 
     monkeypatch.setattr(uvicorn, "run", mock_run)

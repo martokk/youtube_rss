@@ -33,7 +33,7 @@ class BaseCRUD(Generic[ModelClass, SchemaCreateClass, SchemaUpdateClass]):
         statement = select(self.model)
         return db.exec(statement).all()
 
-    async def get(self, db: Session, *args: BinaryExpression[Any], **kwargs: Any) -> ModelClass:
+    async def get(self, *args: BinaryExpression[Any], db: Session, **kwargs: Any) -> ModelClass:
         """
         Get a record by its primary key(s).
 
@@ -72,7 +72,7 @@ class BaseCRUD(Generic[ModelClass, SchemaCreateClass, SchemaUpdateClass]):
             The matching record, or None.
         """
         try:
-            result = await self.get(db=db, *args, **kwargs)
+            result = await self.get(*args, db=db, **kwargs)
         except RecordNotFoundError:
             return None
         return result
@@ -134,7 +134,7 @@ class BaseCRUD(Generic[ModelClass, SchemaCreateClass, SchemaUpdateClass]):
 
         """
 
-        db_obj = await self.get(db=db, *args, **kwargs)
+        db_obj = await self.get(*args, db=db, **kwargs)
 
         in_obj_values = in_obj.dict(exclude_unset=True, exclude_none=True)
         db_obj_values = db_obj.dict()
@@ -146,7 +146,7 @@ class BaseCRUD(Generic[ModelClass, SchemaCreateClass, SchemaUpdateClass]):
         db.refresh(db_obj)
         return db_obj
 
-    async def delete(self, db: Session, *args: BinaryExpression[Any], **kwargs: Any) -> None:
+    async def delete(self, *args: BinaryExpression[Any], db: Session, **kwargs: Any) -> None:
         """
         Delete a record.
 
@@ -158,7 +158,7 @@ class BaseCRUD(Generic[ModelClass, SchemaCreateClass, SchemaUpdateClass]):
         Raises:
             DeleteError: If an error occurs while deleting the record.
         """
-        db_obj = await self.get(db=db, *args, **kwargs)
+        db_obj = await self.get(*args, db=db, **kwargs)
         try:
             db.delete(db_obj)
             db.commit()

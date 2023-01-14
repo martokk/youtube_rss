@@ -8,9 +8,9 @@ from sqlmodel import Session, SQLModel
 from youtube_rss import crud
 from youtube_rss.core.app import app
 from youtube_rss.core.auth import AuthHandler
-from youtube_rss.models.source import Source, SourceCreate
-from youtube_rss.models.user import UserCreate, UserDB
-from youtube_rss.models.video import Video, VideoCreate
+from youtube_rss.models.source import SourceCreate
+from youtube_rss.models.user import UserCreate
+from youtube_rss.models.video import VideoCreate
 
 
 @pytest.fixture(name="db")
@@ -49,7 +49,7 @@ async def fixture_db_with_source(db_with_user: Session) -> Session:
     """
     Fixture that creates an example source in the test database.
     """
-    source = SourceCreate(
+    source_create = SourceCreate(
         url="https://rumble.com/c/Styxhexenhammer666",
         name="Styxhexenhammer666",
         logo="https://sp.rmbl.ws/z8/t/j/s/b/tjsba.baa.1-Styxhexenhammer666-qyv16v.png",
@@ -64,7 +64,7 @@ async def fixture_db_with_source(db_with_user: Session) -> Session:
         added_at=datetime.datetime.now(tz=datetime.timezone.utc),
         created_by="ZbFPeSXW",
     )
-    source = await crud.source.create(in_obj=source, db=db_with_user)
+    await crud.source.create(in_obj=source_create, db=db_with_user)
     return db_with_user
 
 

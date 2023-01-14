@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import HTMLResponse
+from sqlmodel import Session
 
 from youtube_rss import crud
 from youtube_rss.api.deps import authenticated_user, get_db
@@ -27,7 +28,7 @@ async def get_rss(source_id: str) -> Response:
 
 @router.put("/{source_id}", response_class=HTMLResponse)
 async def build_rss(
-    source_id: str, db=Depends(get_db), _: Any = Depends(authenticated_user())
+    source_id: str, db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> Response:
     """
     Builds a new rss file for source_id and returns it as a Response.
@@ -49,7 +50,7 @@ async def build_rss(
 
 @router.delete("/{source_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_rss(
-    source_id: str, db=Depends(get_db), _: Any = Depends(authenticated_user())
+    source_id: str, db: Session = Depends(get_db), _: Any = Depends(authenticated_user())
 ) -> None:
     """
     Deletes the .rss file for a feed.

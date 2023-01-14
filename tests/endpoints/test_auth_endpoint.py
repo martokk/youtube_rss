@@ -133,7 +133,7 @@ def test_protected_unauthenticated(client: TestClient) -> None:
     assert response.json()["detail"] == "Not authenticated"
 
 
-def test_protected_invalid_token(client: TestClient):
+def test_protected_invalid_token(client: TestClient) -> None:
     response = client.get("/protected", headers={"Authorization": "Bearer invalid_token"})
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid Token"

@@ -3,7 +3,6 @@ from typing import Any
 from sqlmodel import Session
 
 from youtube_rss import crud
-from youtube_rss.api.deps import get_db
 from youtube_rss.handlers import get_handler_from_url
 from youtube_rss.models.source import Source, SourceCreate
 from youtube_rss.models.video import Video, VideoCreate
@@ -62,10 +61,9 @@ async def get_source_from_source_info_dict(
     Parameters:
         source_info_dict (dict): The source_info_dict.
         user_id (str): user_id of authenticated user.
-        db (Session): The database session.
 
     Returns:
-        Source: The `Source` object.
+        SourceCreate: The `SourceCreate` object.
     """
     handler = get_handler_from_url(url=source_info_dict["metadata"]["url"])
     source_videos = await get_source_videos_from_source_info_dict(source_info_dict=source_info_dict)
@@ -77,7 +75,9 @@ async def get_source_from_source_info_dict(
     )
 
 
-async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, Any]) -> list[Video]:
+async def get_source_videos_from_source_info_dict(
+    source_info_dict: dict[str, Any]
+) -> list[VideoCreate]:
     """
     Get a list of `Video` objects from a source_info_dict.
 
@@ -97,7 +97,7 @@ async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, An
         for playlist in playlists
         for entry_info_dict in playlist.get("entries", [])
     ]
-    videos = [Video(**video_dict) for video_dict in video_dicts]
+    videos = [VideoCreate(**video_dict) for video_dict in video_dicts]
     return videos
 
 
@@ -112,7 +112,7 @@ async def refresh_all_sources(db: Session) -> list[Source]:
         The list of refreshed Sources.
     """
     sources = await crud.source.get_all(db=db) or []
-    return await refresh_sources(sources=sources)
+    return await refresh_sources(sources=sources, db=db)
 
 
 async def refresh_sources(sources: list[Source], db: Session) -> list[Source]:
@@ -130,8 +130,8 @@ async def refresh_sources(sources: list[Source], db: Session) -> list[Source]:
 
 
 async def add_new_source_videos_from_fetched_videos(
-    fetched_videos: list[Video], db_source: Source, db: Session
-) -> list[Video]:
+    fetched_videos: list[VideoCreate], db_source: Source, db: Session
+) -> list[VideoCreate]:
     """
     Add new videos from a list of fetched videos to a source in the database.
 

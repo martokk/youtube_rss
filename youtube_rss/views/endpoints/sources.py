@@ -20,6 +20,7 @@ async def read_root(request: Request, username: str, db: Session = Depends(get_d
     Args:
         request(Request): The request object
         username: The username to display
+        db(Session): The database session.
 
     Returns:
         Response: HTML page with list of sources

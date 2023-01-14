@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, Response
+from sqlmodel import Session
 
 from youtube_rss import crud
+from youtube_rss.api.deps import get_db
 from youtube_rss.core.logger import logger
 from youtube_rss.core.proxy import reverse_proxy
-from youtube_rss.api.deps import get_db
 from youtube_rss.handlers import get_handler_from_string
 
 router = APIRouter()
@@ -12,7 +13,7 @@ router = APIRouter()
 
 @router.get("/{video_id}")
 @router.head("/{video_id}")
-async def handle_media(video_id: str, request: Request, db=Depends(get_db)) -> Response:
+async def handle_media(video_id: str, request: Request, db: Session = Depends(get_db)) -> Response:
     """
     Handles the repose for a media request by video_id.
     Uses a reverse proxy if required by the handler.
