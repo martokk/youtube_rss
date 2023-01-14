@@ -1,11 +1,11 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlmodel import Session
 
-from youtube_rss.api.v1.deps import get_active_user_id
+from youtube_rss import crud
 from youtube_rss.core.auth import AuthHandler
-from youtube_rss.crud.exceptions import RecordNotFoundError
-from youtube_rss.crud.user import user_crud
+from youtube_rss.api.deps import get_active_user_id, get_db
 from youtube_rss.models.user import UserCreate, UserDB, UserLogin, UserRead
 
 router = APIRouter()
@@ -19,12 +19,13 @@ auth_handler = AuthHandler()
     response_model=UserRead,
     summary="Create new user",
 )
-async def register(user_create: UserCreate) -> UserDB:
+async def register(user_create: UserCreate, db: Session = Depends(get_db)) -> UserDB:
     """
     Register a new user.
 
     Args:
         user_create (UserCreate): the user information for registration
+        db (Session): The database session.
 
     Returns:
         UserDB: an UserDB object
@@ -34,7 +35,7 @@ async def register(user_create: UserCreate) -> UserDB:
     """
 
     # Check if username/email is already taken.
-    users = await user_crud.get_all() or []
+    users = await crud.user.get_all(db=db) or []
     if any(user.username == user_create.username for user in users):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username is taken.")
     if any(user.email == user_create.email for user in users):
@@ -46,18 +47,17 @@ async def register(user_create: UserCreate) -> UserDB:
     hashed_password = auth_handler.get_password_hash(password=user_create.password)
     user_create.password = hashed_password
 
-    # Save to Database
-    user = UserDB(**user_create.dict())
-    return await user_crud.create(user)
+    return await crud.user.create(in_obj=user_create, db=db)
 
 
 @router.post("/login", summary="Create access and refresh tokens for user")
-async def login(user_login: UserLogin) -> dict[str, str]:
+async def login(user_login: UserLogin, db: Session = Depends(get_db)) -> dict[str, str]:
     """
     Log in an existing user.
 
     Args:
         user_login (UserLogin): the user information for login
+        db (Session, optional): The database session.
 
     Returns:
         dict: A dictionary containing the authentication token
@@ -67,8 +67,8 @@ async def login(user_login: UserLogin) -> dict[str, str]:
     """
     invalid_username_password_text = "Invalid username and/or password."
     try:
-        user = await user_crud.get(username=user_login.username)
-    except RecordNotFoundError as e:
+        user = await crud.user.get(username=user_login.username, db=db)
+    except crud.RecordNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=invalid_username_password_text
         ) from e

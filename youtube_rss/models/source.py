@@ -69,6 +69,13 @@ class SourceCreate(SourceBase):
         return values
 
 
+class SourceUpdate(SourceBase):
+    @root_validator
+    def create_updated_at(cls, values: dict[str, Any | None]) -> dict[str, Any]:
+        values["updated_at"] = datetime.datetime.now(tz=datetime.timezone.utc)
+        return values
+
+
 class SourceRead(SourceBase):
     pass
 

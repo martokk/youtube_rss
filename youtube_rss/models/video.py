@@ -68,6 +68,10 @@ class VideoCreate(VideoBase):
         return values
 
 
+class VideoUpdate(VideoCreate):
+    pass
+
+
 class VideoRead(VideoBase):
     source_id: str = Field(default=None, foreign_key="source.id")
 

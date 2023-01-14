@@ -5,7 +5,7 @@ import re
 
 from yt_dlp.extractor.common import InfoExtractor
 
-from youtube_rss.config import BUILD_FEED_DATEAFTER, BUILD_FEED_RECENT_VIDEOS
+from youtube_rss import settings
 from youtube_rss.services.ytdlp import YDL_OPTS_BASE
 
 from .base import ServiceHandler
@@ -71,8 +71,8 @@ class YoutubeHandler(ServiceHandler):
             **YDL_OPTS_BASE,
             "playlistreverse": True,
             "extract_flat": extract_flat,
-            "playlistend": BUILD_FEED_RECENT_VIDEOS,
-            "dateafter": BUILD_FEED_DATEAFTER,
+            "playlistend": settings.build_feed_recent_videos,
+            "dateafter": settings.build_feed_dateafter,
         }
 
     def map_source_info_dict_to_source_dict(

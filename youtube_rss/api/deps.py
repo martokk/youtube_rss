@@ -1,6 +1,10 @@
-from typing import Callable
+from collections.abc import Callable, Generator
+
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import Session
 
 from youtube_rss.core.auth import AuthHandler
+from youtube_rss.core.database import engine
 
 
 def get_active_user_id() -> Callable[..., str]:
@@ -25,3 +29,12 @@ def authenticated_user() -> Callable[..., str]:
         function: The authentication function that can be used to authenticate users.
     """
     return get_active_user_id()
+
+
+def get_db() -> Generator[Session, None, None]:
+    _session = sessionmaker(bind=engine, class_=Session, expire_on_commit=False)
+    session = _session()
+    try:
+        yield session
+    finally:
+        session.close()

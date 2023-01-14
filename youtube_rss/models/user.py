@@ -34,6 +34,10 @@ class UserCreate(UserBase):
         return {**values, "id": _id}
 
 
+class UserUpdate(UserBase):
+    pass
+
+
 class UserRead(UserBase):
     pass
 

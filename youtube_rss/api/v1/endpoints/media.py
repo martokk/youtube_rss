@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, Response
 
+from youtube_rss import crud
 from youtube_rss.core.logger import logger
 from youtube_rss.core.proxy import reverse_proxy
-from youtube_rss.crud.exceptions import RecordNotFoundError
-from youtube_rss.crud.video import video_crud
+from youtube_rss.api.deps import get_db
 from youtube_rss.handlers import get_handler_from_string
 
 router = APIRouter()
@@ -12,14 +12,14 @@ router = APIRouter()
 
 @router.get("/{video_id}")
 @router.head("/{video_id}")
-async def handle_media(video_id: str, request: Request) -> Response:
+async def handle_media(video_id: str, request: Request, db=Depends(get_db)) -> Response:
     """
     Handles the repose for a media request by video_id.
     Uses a reverse proxy if required by the handler.
     """
     try:
-        video = await video_crud.get(id=video_id)
-    except RecordNotFoundError as e:
+        video = await crud.video.get(id=video_id, db=db)
+    except crud.RecordNotFoundError as e:
         logger.error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

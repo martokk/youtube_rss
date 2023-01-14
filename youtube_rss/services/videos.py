@@ -1,7 +1,12 @@
 from typing import Any
 
+from datetime import datetime, timedelta
+
+from sqlmodel import Session
+
+from youtube_rss import crud, settings
 from youtube_rss.handlers import get_handler_from_url
-from youtube_rss.models.video import Video
+from youtube_rss.models.video import Video, VideoCreate
 from youtube_rss.services.ytdlp import get_info_dict
 
 
@@ -41,8 +46,100 @@ async def get_video_info_dict(
     return info_dict
 
 
-async def get_video_from_video_info_dict(video_info_dict: dict[str, Any], source_id: str) -> Video:
+async def get_video_from_video_info_dict(
+    video_info_dict: dict[str, Any], source_id: str
+) -> VideoCreate:
     handler = get_handler_from_url(url=video_info_dict["webpage_url"])
     video_dict = handler.map_video_info_dict_entity_to_video_dict(entry_info_dict=video_info_dict)
     video_dict["source_id"] = source_id
-    return Video(**video_dict)
+    return VideoCreate(**video_dict)
+
+
+async def refresh_all_videos(older_than_hours: int, db: Session) -> list[Video]:
+    """
+    Fetches new data from yt-dlp for all Videos that are older than a certain number of hours.
+
+    Args:
+        older_than_hours: The minimum age of the videos to refresh, in hours.
+        db (Session): The database session.
+
+    Returns:
+        The refreshed list of videos.
+    """
+    videos = await crud.video.get_all(db=db) or []
+    return await refresh_videos(videos=videos, older_than_hours=older_than_hours, db=db)
+
+
+async def fetch_videos(videos: list[Video], db: Session) -> list[Video]:
+    """
+    Fetches new data for a list of videos from yt-dlp.
+
+    Args:
+        videos: The list of videos to fetch.
+        db (Session): The database session.
+
+    Returns:
+        The fetched list of videos.
+    """
+    return [await crud.video.fetch_video(video_id=video.id, db=db) for video in videos]
+
+
+async def refresh_videos(
+    videos: list[Video], db: Session, older_than_hours: int = settings.max_video_age_hours
+) -> list[Video]:
+    """
+    Fetches new data from yt-dlp for videos that meet all criteria.
+
+    Args:
+        videos: The list of videos to refresh.
+        older_than_hours: The minimum age of the videos to refresh, in hours.
+        db (Session): The database session.
+
+    Returns:
+        The refreshed list of videos.
+    """
+    age_threshold = datetime.utcnow() - timedelta(hours=older_than_hours)
+    videos_needing_refresh = [
+        video
+        for video in videos
+        if (
+            video.updated_at < age_threshold or video.released_at is None or video.media_url is None
+        )
+    ]
+    sorted_videos_needing_refresh = await sort_videos_by_updated_at(videos=videos_needing_refresh)
+    return await fetch_videos(videos=sorted_videos_needing_refresh, db=db)
+
+
+async def sort_videos_by_updated_at(videos: list[Video]) -> list[Video]:
+    """
+    Sorts a list of videos by the `updated_at` property.
+
+    Args:
+        videos: The list of videos to sort.
+
+    Returns:
+        The sorted list of videos.
+    """
+    return sorted(videos, key=lambda video: video.updated_at, reverse=False)
+
+
+async def get_media_url_from_video_id(video_id: str, db: Session) -> str:
+    """
+    Get the media URL for a video.
+
+    Args:
+        video_id: The id of the video to get the media URL for.
+        db (Session): The database session.
+
+    Returns:
+        The media URL for the video.
+
+    Raises:
+        ValueError: If the media URL for the video cannot be fetched.
+    """
+    video = await crud.video.get(id=video_id, db=db)
+    if not video.media_url:
+        video = await crud.video.fetch_video(video_id=video_id, db=db)
+        if not video.media_url:
+            raise ValueError("Unable to fetch media_url")
+    return video.media_url

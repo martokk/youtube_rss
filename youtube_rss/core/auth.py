@@ -5,13 +5,7 @@ from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
 
-from youtube_rss.config import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    ALGORITHM,
-    JWT_REFRESH_SECRET_KEY,
-    JWT_SECRET_KEY,
-    REFRESH_TOKEN_EXPIRE_MINUTES,
-)
+from youtube_rss import settings
 
 
 class AuthHandler:
@@ -58,11 +52,13 @@ class AuthHandler:
             token (str): encoded token
         """
         payload = {
-            "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            "exp": datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes),
             "iat": datetime.utcnow(),
             "sub": user_id,
         }
-        return jwt.encode(payload=payload, key=JWT_SECRET_KEY, algorithm=ALGORITHM)
+        return jwt.encode(
+            payload=payload, key=settings.jwt_access_secret_key, algorithm=settings.algorithm
+        )
 
     def encode_refresh_token(self, user_id: str) -> str:
         """
@@ -75,11 +71,13 @@ class AuthHandler:
             refresh token (str): encoded token
         """
         payload = {
-            "exp": datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES),
+            "exp": datetime.utcnow() + timedelta(minutes=settings.refresh_token_expire_minutes),
             "iat": datetime.utcnow(),
             "sub": user_id,
         }
-        return jwt.encode(payload=payload, key=JWT_REFRESH_SECRET_KEY, algorithm=ALGORITHM)
+        return jwt.encode(
+            payload=payload, key=settings.jwt_refresh_secret_key, algorithm=settings.algorithm
+        )
 
     def decode_access_token(self, token: str) -> str:
         """
@@ -96,7 +94,7 @@ class AuthHandler:
         """
         try:
             payload: dict[str, str] = jwt.decode(
-                jwt=token, key=JWT_SECRET_KEY, algorithms=[ALGORITHM]
+                jwt=token, key=settings.jwt_access_secret_key, algorithms=[settings.algorithm]
             )
         except jwt.ExpiredSignatureError as e:
             raise HTTPException(
@@ -122,7 +120,9 @@ class AuthHandler:
             HTTPException: when token is expired or invalid.
         """
         try:
-            payload = jwt.decode(jwt=token, key=JWT_REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(
+                jwt=token, key=settings.jwt_refresh_secret_key, algorithms=[settings.algorithm]
+            )
         except jwt.ExpiredSignatureError as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Expired Token"
