@@ -24,6 +24,8 @@ app = FastAPI(
 )
 app.include_router(api_router)
 app.include_router(views_router)
+
+FEEDS_PATH.mkdir(parents=True, exist_ok=True)
 app.mount("/feed", StaticFiles(directory=FEEDS_PATH), name="feed")
 
 
