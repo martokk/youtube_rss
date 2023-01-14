@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
 from youtube_rss import crud
-from youtube_rss.core.auth import AuthHandler
 from youtube_rss.api.deps import get_active_user_id, get_db
+from youtube_rss.core.auth import AuthHandler
 from youtube_rss.models.user import UserCreate, UserDB, UserLogin, UserRead
 
 router = APIRouter()

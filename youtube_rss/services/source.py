@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import Depends
+from sqlmodel import Session
 
 from youtube_rss import crud
 from youtube_rss.api.deps import get_db
@@ -101,7 +101,7 @@ async def get_source_videos_from_source_info_dict(source_info_dict: dict[str, An
     return videos
 
 
-async def refresh_all_sources(db=Depends(get_db)) -> list[Source]:
+async def refresh_all_sources(db: Session) -> list[Source]:
     """
     Fetches new data from yt-dlp for all Sources.
 
@@ -115,7 +115,7 @@ async def refresh_all_sources(db=Depends(get_db)) -> list[Source]:
     return await refresh_sources(sources=sources)
 
 
-async def refresh_sources(sources: list[Source], db=Depends(get_db)) -> list[Source]:
+async def refresh_sources(sources: list[Source], db: Session) -> list[Source]:
     """
     Fetches new data from yt-dlp for each Source.
 
@@ -130,7 +130,7 @@ async def refresh_sources(sources: list[Source], db=Depends(get_db)) -> list[Sou
 
 
 async def add_new_source_videos_from_fetched_videos(
-    fetched_videos: list[Video], db_source: Source, db=Depends(get_db)
+    fetched_videos: list[Video], db_source: Source, db: Session
 ) -> list[Video]:
     """
     Add new videos from a list of fetched videos to a source in the database.
@@ -157,7 +157,7 @@ async def add_new_source_videos_from_fetched_videos(
 
 
 async def delete_orphaned_source_videos(
-    fetched_videos: list[Video], db_source: Source, db=Depends(get_db)
+    fetched_videos: list[Video], db_source: Source, db: Session
 ) -> list[Video]:
     """
     Delete videos that are no longer present in `fetched_videos`.

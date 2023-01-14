@@ -1,8 +1,7 @@
 import typer
 from rich.console import Console
 
-from youtube_rss import version
-from youtube_rss.constants import PACKAGE_DESCRIPTION, PACKAGE_NAME
+from youtube_rss import settings, version
 from youtube_rss.core.logger import logger
 from youtube_rss.core.server import start_server
 
@@ -11,8 +10,8 @@ console = Console()
 
 # Configure Typer
 typer_app = typer.Typer(
-    name=PACKAGE_NAME,
-    help=PACKAGE_DESCRIPTION,
+    name=settings.project_name,
+    help=settings.project_description,
     add_completion=False,
 )
 
@@ -21,7 +20,7 @@ typer_app = typer.Typer(
 def version_callback(print_version: bool) -> None:
     """Print the version of the package."""
     if print_version:
-        console.print(f"[yellow]{PACKAGE_NAME}[/] version: [bold blue]{version}[/]")
+        console.print(f"[yellow]{settings.project_name}[/] version: [bold blue]{version}[/]")
         raise typer.Exit()
 
 

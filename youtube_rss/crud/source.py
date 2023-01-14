@@ -105,7 +105,7 @@ class SourceCRUD(BaseCRUD[Source, SourceCreate, SourceUpdate]):
         )
 
         added_videos = await add_new_source_videos_from_fetched_videos(
-            fetched_videos=fetched_videos, db_source=db_source
+            fetched_videos=fetched_videos, db_source=db_source, db=db
         )
 
         # NOTE: Enable if db grows too large. Otherwise best not to delete any videos
