@@ -40,7 +40,7 @@ typer = {extras = ["all"], version = "^0.6.1"}
 rich = "^12.6.0"
 colorama = "^0.4.5"
 fastapi = "^0.88.0"
-uvicorn = "^0.20.0"
+uvicorn = "^0.21.1"
 pyyaml = "^6.0"
 python-dotenv = "^0.21.0"
 yt-dlp = "^2022.11.11"
